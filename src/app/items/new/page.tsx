@@ -11,6 +11,8 @@ export default function NewItemPage() {
   const [title, setTitle] = useState('')
   const [description, setDescription] = useState('')
   const [category, setCategory] = useState('')
+  const [customCategory, setCustomCategory] = useState('')
+  const [estimatedValue, setEstimatedValue] = useState('')
   const [images, setImages] = useState<File[]>([])
   const [previews, setPreviews] = useState<string[]>([])
   const [loading, setLoading] = useState(false)
@@ -72,13 +74,18 @@ export default function NewItemPage() {
       uploadedUrls.push(publicUrl)
     }
 
+    const finalCategory = category === 'Other' && customCategory.trim()
+      ? customCategory.trim()
+      : category
+
     const { error: insertError } = await supabase.from('items').insert({
       user_id: userId,
       title,
       description,
-      category,
+      category: finalCategory,
       images: uploadedUrls,
       country: userCountry,
+      ...(estimatedValue ? { estimated_value: parseFloat(estimatedValue) } : {}),
     })
 
     if (insertError) {
@@ -166,13 +173,42 @@ export default function NewItemPage() {
             required
             value={category}
             onChange={(e) => setCategory(e.target.value)}
-            className="w-full px-3 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm bg-white"
+            className="w-full px-3 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm bg-white text-gray-900"
           >
             <option value="">Select a category...</option>
             {CATEGORIES.map((c) => (
               <option key={c} value={c}>{c}</option>
             ))}
           </select>
+          {category === 'Other' && (
+            <input
+              required
+              value={customCategory}
+              onChange={(e) => setCustomCategory(e.target.value)}
+              maxLength={50}
+              className="mt-2 w-full px-3 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm text-gray-900 placeholder-gray-400"
+              placeholder="Describe your category (e.g. Vintage cameras)"
+            />
+          )}
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Your item&apos;s estimated value <span className="text-gray-400 font-normal">(optional)</span>
+          </label>
+          <div className="relative">
+            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm">£</span>
+            <input
+              type="number"
+              min="0"
+              step="0.01"
+              value={estimatedValue}
+              onChange={(e) => setEstimatedValue(e.target.value)}
+              className="w-full pl-7 pr-3 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm text-gray-900 placeholder-gray-400"
+              placeholder="0.00"
+            />
+          </div>
+          <p className="text-xs text-gray-400 mt-1">If your item is worth more than what someone offers, you can request a cash top-up to cover the difference.</p>
         </div>
 
         {category === 'Food & Drinks' && (
