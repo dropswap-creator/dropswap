@@ -93,9 +93,6 @@ export default function HomePage() {
           <h1 className="text-5xl font-bold mb-4 leading-tight">
             Everything&apos;s gone up.<br />Your swaps don&apos;t have to.
           </h1>
-          <p className="text-indigo-200 text-lg mb-2">
-            Trade what you have for what you need — no money, no middlemen.
-          </p>
           <p className="text-indigo-300 text-sm mb-1">One person&apos;s junk is another person&apos;s treasure. Everything has value to someone.</p>
           <p className="text-indigo-400 text-xs mb-8">Back to Barter. Swap More. Spend Less. Forward Together.</p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
