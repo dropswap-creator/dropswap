@@ -10,6 +10,7 @@ import type { Swap, Message, Rating, SwapStatus } from '@/lib/types'
 import {
   Send, AlertTriangle, CheckCircle, Package, Star, ArrowLeftRight
 } from 'lucide-react'
+import StripePayButton from '@/components/StripePayButton'
 
 const SWAP_STEPS = [
   { statuses: ['pending'], label: 'Offer sent' },
@@ -310,6 +311,55 @@ export default function SwapDetailPage() {
               Raise a dispute
             </button>
           )}
+        </div>
+      )}
+
+      {/* Swap Bond Payment */}
+      {swap.status === 'accepted' && userId && (
+        <div className="bg-amber-50 border border-amber-200 rounded-2xl p-5">
+          <h2 className="font-semibold text-gray-900 mb-1">Swap Bond Required</h2>
+          <p className="text-sm text-gray-600 mb-4">
+            Both parties must pay a refundable swap bond before shipping. The bond is 10% of your item&apos;s declared value (min £2, max £20). It is returned automatically once the swap completes.
+          </p>
+          <div className="flex flex-col sm:flex-row gap-3 items-start">
+            <div>
+              <label className="text-xs text-gray-500 mb-1 block">Your item&apos;s estimated value (£)</label>
+              <input
+                type="number"
+                min="1"
+                max="500"
+                placeholder="e.g. 25"
+                id="declared-value"
+                className="px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 w-32"
+              />
+            </div>
+            <div className="mt-5">
+              <StripePayButton
+                type="bond"
+                swapId={id}
+                userId={userId}
+                itemValue={25}
+                label="Pay Swap Bond"
+              />
+            </div>
+          </div>
+          <p className="text-xs text-amber-700 mt-3">⚠️ Shipping will not be confirmed until both parties have paid their bond.</p>
+        </div>
+      )}
+
+      {/* Completion Fee */}
+      {swap.status === 'completed' && isReceiver && userId && (
+        <div className="bg-green-50 border border-green-200 rounded-2xl p-5">
+          <h2 className="font-semibold text-gray-900 mb-1">Swap Complete!</h2>
+          <p className="text-sm text-gray-600 mb-4">
+            A small £1.00 platform fee applies to completed swaps, paid by the receiver. This helps keep DropSwap free for everyone.
+          </p>
+          <StripePayButton
+            type="completion"
+            swapId={id}
+            userId={userId}
+            label="Pay £1.00 Completion Fee"
+          />
         </div>
       )}
 
