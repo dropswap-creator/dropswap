@@ -96,7 +96,8 @@ export default function HomePage() {
           <p className="text-indigo-200 text-lg mb-2">
             Trade what you have for what you need — no money, no middlemen.
           </p>
-          <p className="text-indigo-300 text-sm mb-8">Back to Barter. Swap More. Spend Less. Forward Together.</p>
+          <p className="text-indigo-300 text-sm mb-1">One person&apos;s junk is another person&apos;s treasure. Everything has value to someone.</p>
+          <p className="text-indigo-400 text-xs mb-8">Back to Barter. Swap More. Spend Less. Forward Together.</p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
             <Link href="/auth/signup" className="bg-white text-indigo-700 font-semibold px-8 py-3 rounded-xl hover:bg-indigo-50 transition-colors flex items-center justify-center gap-2">
               Start Swapping Free <ArrowRight size={16} />
