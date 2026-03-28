@@ -19,6 +19,7 @@ const allowed = [
   'Experiences & services',
   'Vehicles & transport items',
   'Pet supplies',
+  'Spiritual & esoteric offers — tarot, astrology, energy healing, crystal work, meditation, and similar',
   'Free giveaway items (small listing fee applies)',
 ]
 

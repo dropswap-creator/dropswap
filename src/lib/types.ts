@@ -15,6 +15,7 @@ export type Category =
   | 'Experiences & Services'
   | 'Vehicles & Transport'
   | 'Pet Supplies'
+  | 'Spiritual & Esoteric'
   | 'Other'
 
 export const CATEGORIES: Category[] = [
@@ -34,6 +35,7 @@ export const CATEGORIES: Category[] = [
   'Experiences & Services',
   'Vehicles & Transport',
   'Pet Supplies',
+  'Spiritual & Esoteric',
   'Other',
 ]
 

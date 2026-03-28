@@ -28,6 +28,7 @@ const CATEGORY_ICONS: Record<string, string> = {
   'Experiences & Services': '✨',
   'Vehicles & Transport': '🚲',
   'Pet Supplies': '🐾',
+  'Spiritual & Esoteric': '🔮',
   'Other': '📦',
 }
 
