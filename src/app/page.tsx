@@ -87,26 +87,15 @@ export default function HomePage() {
   return (
     <div>
       {/* Hero */}
-      <div className="relative bg-gradient-to-br from-indigo-600 via-indigo-700 to-purple-700 text-white rounded-3xl mb-12 overflow-hidden">
-        <div className="absolute inset-0 opacity-10">
-          <div className="absolute top-10 left-10 w-40 h-40 rounded-full bg-white" />
-          <div className="absolute bottom-10 right-20 w-64 h-64 rounded-full bg-white" />
-          <div className="absolute top-1/2 left-1/2 w-20 h-20 rounded-full bg-white" />
-        </div>
-        <div className="relative px-8 py-16 text-center max-w-3xl mx-auto">
-          <div className="inline-flex items-center gap-2 bg-white/20 rounded-full px-4 py-1.5 text-sm font-medium mb-6">
-            <Recycle size={14} />
-            Trade like the old days. Keep it local.
-          </div>
+      <div className="bg-gradient-to-br from-indigo-600 via-indigo-700 to-purple-700 text-white rounded-3xl mb-12">
+        <div className="px-8 py-16 text-center max-w-2xl mx-auto">
           <h1 className="text-5xl font-bold mb-4 leading-tight">
             Everything&apos;s gone up.<br />Your swaps don&apos;t have to.
           </h1>
-          <p className="text-indigo-100 text-xl mb-3">
-            Cost of living crisis? Beat it. Trade what you have for what you need — no money, no middlemen, no government taking a cut.
+          <p className="text-indigo-200 text-lg mb-2">
+            Trade what you have for what you need — no money, no middlemen.
           </p>
-          <p className="text-indigo-200 text-base mb-8">
-            DropSwap brings back the oldest economy in the world — your community. Local. Fair. Free.
-          </p>
+          <p className="text-indigo-300 text-sm mb-8">Trade like the old days. Keep it local.</p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
             <Link href="/auth/signup" className="bg-white text-indigo-700 font-semibold px-8 py-3 rounded-xl hover:bg-indigo-50 transition-colors flex items-center justify-center gap-2">
               Start Swapping Free <ArrowRight size={16} />
