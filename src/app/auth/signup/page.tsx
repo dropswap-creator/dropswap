@@ -68,7 +68,7 @@ export default function SignupPage() {
           <ArrowLeftRight size={22} />
           DropSwap
         </div>
-        <p className="text-center text-sm font-medium text-gray-700 mb-6">Trade like the old days. Keep it local.</p>
+        <p className="text-center text-sm font-medium text-gray-700 mb-6">Back to Barter. Swap More. Spend Less. Forward Together.</p>
 
         <h1 className="text-2xl font-bold text-gray-900 text-center mb-6">Create account</h1>
 
