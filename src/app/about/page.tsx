@@ -11,44 +11,56 @@ export default function AboutPage() {
         </div>
         <h1 className="text-4xl font-bold text-gray-900 mb-4">About Us</h1>
         <p className="text-xl text-gray-500 italic">
-          "Trade like the old days. Keep it local. Keep the community alive."
+          "Back to Barter. Swap More. Spend Less. Forward Together."
         </p>
       </div>
 
       <div className="bg-white rounded-2xl border border-gray-100 p-8 space-y-6 text-gray-600 leading-relaxed">
-        <p>
-          Rent is up. Food is up. Energy bills are up. Wages? Not so much. The cost of living has hit everyone hard — and the system that's supposed to help isn't working for ordinary people.
-        </p>
-        <p>
-          DropSwap is our answer to that.
-        </p>
-        <p>
-          Long before banks, before currencies, before governments taxing every transaction — people just traded. A farmer gave grain to a blacksmith in exchange for tools. A neighbour swapped home-grown vegetables for a hand-sewn coat. Communities thrived because they looked after each other, not because a corporation or a government told them to.
-        </p>
-        <p>
-          That's the world DropSwap is trying to bring back.
-        </p>
-        <p>
-          We believe value is what two people agree it is — not what a price tag says. A hat might be worth a mug to one person and a jacket to another. No middlemen. No platform taking 15%. No algorithms. No government getting a cut of your trade. Just two people, two items, and a handshake.
-        </p>
-        <p>
-          DropSwap is free to use, built on trust, and designed for real communities. Whether you're in a city, a town, or a village — there's someone near you who has what you need, and needs what you have.
-        </p>
-        <p className="font-medium text-gray-800">
-          Stop shopping. Start swapping. Keep it local.
-        </p>
+
+        <div>
+          <h2 className="font-bold text-gray-900 text-xl mb-3">Who We Are</h2>
+          <p>
+            DropSwap is a UK-based community platform built by ordinary people who got tired of watching everything get more expensive. We're not a bank, not a marketplace, not a corporation. We're just people who believe there's a smarter way to live — and it's been around for thousands of years.
+          </p>
+        </div>
+
+        <div>
+          <h2 className="font-bold text-gray-900 text-xl mb-3">Why We Built This</h2>
+          <p>
+            Rent is up. Food is up. Energy is up. Wages aren't keeping pace and the pressure on everyday households is real. Most people already have exactly what someone else needs sitting in their home — a jacket that no longer fits, a book already read, a tool gathering dust in the garage.
+          </p>
+          <p className="mt-4">
+            Money isn't the only form of value. Your stuff has value. Your skills have value. Your time has value. DropSwap lets you use what you already have to get what you actually need — without spending a penny.
+          </p>
+        </div>
+
+        <div>
+          <h2 className="font-bold text-gray-900 text-xl mb-3">Trade Like the Old Days</h2>
+          <p>
+            Long before banks and price tags, communities traded. A farmer gave grain to a blacksmith for tools. A neighbour swapped vegetables for a coat. No middlemen, no fees, no government taking a cut — just two people making a fair deal.
+          </p>
+          <p className="mt-4">
+            That's what DropSwap brings back. Value is what two people agree it is — not what a label says. You set the terms. You make the trade. You keep everything.
+          </p>
+        </div>
+
+        <div>
+          <h2 className="font-bold text-gray-900 text-xl mb-3">Use Your Resources</h2>
+          <p>
+            Most of us are sitting on more than we think. Before you buy something new, ask yourself — could I swap for it? Before you throw something away, ask — could someone else use this? DropSwap connects you with people nearby who have what you want and want what you have. No money needs to change hands. Ever.
+          </p>
+        </div>
 
         <div className="border-t border-gray-100 pt-6">
-          <h2 className="font-bold text-gray-900 text-lg mb-3">Our principles</h2>
+          <h2 className="font-bold text-gray-900 text-lg mb-3">Our Principles</h2>
           <ul className="space-y-2">
             {[
-              'The cost of living is a problem — swapping is part of the solution',
-              'No money changes hands — this is pure barter, nothing else',
-              'Keep it local — build real connections in your community',
-              'Any item can be swapped for any other item — as long as both people agree',
-              'Honesty is everything — describe and photograph your items accurately',
-              'Respect the community — treat others as you would want to be treated',
-              'Trust is earned — every completed swap builds your reputation',
+              'Everything has value — not just money',
+              'Use what you already have before spending a penny',
+              'Keep it local — build real connections in your area',
+              'No middlemen, no platform fees, no percentage taken',
+              'Trust is everything — honesty and photos are non-negotiable',
+              'The community looks after each other — treat people as you want to be treated',
             ].map((p, i) => (
               <li key={i} className="flex items-start gap-2">
                 <span className="text-indigo-500 mt-0.5">→</span>
@@ -60,7 +72,7 @@ export default function AboutPage() {
 
         <div className="bg-indigo-50 rounded-xl p-5">
           <p className="text-indigo-800 font-medium text-sm">
-            "Where communities look after each other, and waste becomes a thing of the past. One swap at a time."
+            "The cost of living crisis is a spending problem — and swapping is the answer. Stop buying what you can barter for. Stop wasting what someone else needs. Forward together."
           </p>
         </div>
       </div>
