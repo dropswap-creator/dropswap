@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { useRouter, usePathname } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase'
-import { ArrowLeftRight, Plus, User, LogOut, List } from 'lucide-react'
+import { ArrowLeftRight, Plus, User, LogOut, List, Gift } from 'lucide-react'
 import type { User as SupaUser } from '@supabase/supabase-js'
 
 export default function Navbar() {
@@ -44,6 +44,17 @@ export default function Navbar() {
               >
                 <Plus size={16} />
                 Post Item
+              </Link>
+              <Link
+                href="/giveaways"
+                className={`flex items-center gap-1.5 text-sm px-3 py-1.5 rounded-lg transition-colors ${
+                  pathname.startsWith('/giveaways')
+                    ? 'text-pink-600 bg-pink-50'
+                    : 'text-gray-600 hover:bg-gray-50'
+                }`}
+              >
+                <Gift size={16} />
+                Giveaways
               </Link>
               <Link
                 href="/swaps"

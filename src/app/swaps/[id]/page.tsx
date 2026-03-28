@@ -42,6 +42,7 @@ export default function SwapDetailPage() {
   const [ratingComment, setRatingComment] = useState('')
   const [myRating, setMyRating] = useState<Rating | null>(null)
   const [loading, setLoading] = useState(true)
+  const [declaredValue, setDeclaredValue] = useState<number>(0)
 
   async function loadSwap() {
     const { data } = await supabase
@@ -329,17 +330,23 @@ export default function SwapDetailPage() {
                 min="1"
                 max="500"
                 placeholder="e.g. 25"
-                id="declared-value"
+                value={declaredValue || ''}
+                onChange={(e) => setDeclaredValue(Number(e.target.value))}
                 className="px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 w-32"
               />
+              {declaredValue > 0 && (
+                <p className="text-xs text-gray-500 mt-1">
+                  Bond: £{Math.min(Math.max(declaredValue * 0.1, 2), 20).toFixed(2)} (refundable)
+                </p>
+              )}
             </div>
             <div className="mt-5">
               <StripePayButton
                 type="bond"
                 swapId={id}
                 userId={userId}
-                itemValue={25}
-                label="Pay Swap Bond"
+                itemValue={declaredValue}
+                label={declaredValue > 0 ? `Pay £${Math.min(Math.max(declaredValue * 0.1, 2), 20).toFixed(2)} Bond` : 'Enter value above'}
               />
             </div>
           </div>
