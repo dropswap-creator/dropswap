@@ -89,6 +89,7 @@ export interface Item {
   images: string[]
   country: string
   status: 'available' | 'in_swap' | 'swapped'
+  estimated_value?: number | null
   created_at: string
   profiles?: Profile
 }

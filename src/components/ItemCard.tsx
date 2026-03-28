@@ -42,7 +42,7 @@ export default function ItemCard({ item }: ItemCardProps) {
           <h3 className="font-semibold text-gray-900 truncate">{item.title}</h3>
           <p className="text-gray-500 text-sm mt-1 line-clamp-2">{item.description}</p>
 
-          <div className="flex items-center gap-3 mt-3">
+          <div className="flex items-center gap-3 mt-3 flex-wrap">
             <span className="flex items-center gap-1 text-xs text-indigo-600 bg-indigo-50 px-2 py-1 rounded-full">
               <Tag size={10} />
               {item.category}
@@ -51,6 +51,11 @@ export default function ItemCard({ item }: ItemCardProps) {
               <MapPin size={10} />
               {item.country}
             </span>
+            {item.estimated_value && (
+              <span className="text-xs text-emerald-700 bg-emerald-50 px-2 py-1 rounded-full font-medium">
+                ~£{item.estimated_value}
+              </span>
+            )}
           </div>
 
           {profile && (

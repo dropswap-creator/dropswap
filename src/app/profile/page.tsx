@@ -15,6 +15,7 @@ export default function MyProfilePage() {
   const [items, setItems] = useState<Item[]>([])
   const [ratings, setRatings] = useState<Rating[]>([])
   const [bio, setBio] = useState('')
+  const [username, setUsername] = useState('')
   const [country, setCountry] = useState('')
   const [saving, setSaving] = useState(false)
   const [saved, setSaved] = useState(false)
@@ -34,6 +35,7 @@ export default function MyProfilePage() {
       if (p) {
         setProfile(p as Profile)
         setBio(p.bio || '')
+        setUsername(p.username || '')
         setCountry(p.country || '')
       }
 
@@ -51,7 +53,7 @@ export default function MyProfilePage() {
   async function saveProfile() {
     if (!userId) return
     setSaving(true)
-    await supabase.from('profiles').update({ bio, country }).eq('id', userId)
+    await supabase.from('profiles').update({ bio, country, username: username || null }).eq('id', userId)
     setSaving(false)
     setSaved(true)
     setTimeout(() => setSaved(false), 2000)
@@ -107,6 +109,16 @@ export default function MyProfilePage() {
             />
 
             <div className="mt-4 space-y-3">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Display name</label>
+                <input
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
+                  maxLength={30}
+                  className="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 text-gray-900 placeholder-gray-400"
+                  placeholder="How others see your name"
+                />
+              </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Bio (optional)</label>
                 <textarea

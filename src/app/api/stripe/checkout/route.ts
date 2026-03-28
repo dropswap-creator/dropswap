@@ -5,7 +5,7 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!)
 
 export async function POST(req: NextRequest) {
   try {
-    const { type, itemValue, swapId, userId } = await req.json()
+    const { type, itemValue, swapId, userId, itemId } = await req.json()
 
     let amount: number
     let description: string
@@ -40,8 +40,12 @@ export async function POST(req: NextRequest) {
         },
       ],
       mode: 'payment',
-      success_url: `${process.env.NEXT_PUBLIC_SITE_URL}/swaps/${swapId}?payment=success&type=${type}`,
-      cancel_url: `${process.env.NEXT_PUBLIC_SITE_URL}/swaps/${swapId}?payment=cancelled`,
+      success_url: type === 'giveaway'
+        ? `${process.env.NEXT_PUBLIC_SITE_URL}/giveaways/${itemId}/claimed`
+        : `${process.env.NEXT_PUBLIC_SITE_URL}/swaps/${swapId}?payment=success&type=${type}`,
+      cancel_url: type === 'giveaway'
+        ? `${process.env.NEXT_PUBLIC_SITE_URL}/giveaways/${itemId}/claim`
+        : `${process.env.NEXT_PUBLIC_SITE_URL}/swaps/${swapId}?payment=cancelled`,
       metadata: {
         type,
         swapId,
