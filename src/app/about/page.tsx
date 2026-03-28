@@ -70,6 +70,25 @@ export default function AboutPage() {
           </ul>
         </div>
 
+        <div>
+          <h2 className="font-bold text-gray-900 text-xl mb-3">The Bigger Picture</h2>
+          <p>
+            We started in the UK. But this isn't just a UK problem — and it was never meant to stay here.
+          </p>
+          <p className="mt-4">
+            The cost of living is crushing people in every country on earth. Inflation, debt, wages that don't stretch — it's the same story whether you're in London, Lagos, or Los Angeles. Money was supposed to make life easier. For most people, it's doing the opposite.
+          </p>
+          <p className="mt-4">
+            Barter doesn't care about exchange rates. It doesn't care about interest rates, recessions, or what the government decides your money is worth tomorrow. Two people, two things of value, one fair trade — that works everywhere, in any language, in any economy.
+          </p>
+          <p className="mt-4">
+            Our vision is a world where swapping becomes as normal as shopping. Where communities are self-sufficient. Where the things you own work harder for you — traded, reused, passed on — instead of sitting idle while you spend money you don't have on things you could have bartered for.
+          </p>
+          <p className="mt-4 font-medium text-gray-800">
+            One swap at a time. One community at a time. Until the whole world remembers that value was never really about money.
+          </p>
+        </div>
+
         <div className="bg-indigo-50 rounded-xl p-5">
           <p className="text-indigo-800 font-medium text-sm">
             "The cost of living crisis is a spending problem — and swapping is the answer. Stop buying what you can barter for. Stop wasting what someone else needs. Forward together."
