@@ -9,10 +9,16 @@ const allowed = [
   'Home & garden items',
   'Art, crafts & handmade goods',
   'Musical instruments',
-  'Food & non-alcoholic drinks',
+  'Factory-sealed or vacuum-packed food & non-alcoholic drinks',
+  'Seeds (plant and garden seeds)',
   'Collectibles & antiques',
   'Furniture',
   'Tools & DIY equipment',
+  'Baby & kids items',
+  'Plants & garden supplies',
+  'Experiences & services',
+  'Vehicles & transport items',
+  'Pet supplies',
   'Free giveaway items (small listing fee applies)',
 ]
 
@@ -26,6 +32,8 @@ const prohibited = [
   'Stolen goods',
   'Live animals',
   'Prescription medication',
+  'Opened, homemade, or loose food items (factory sealed/vacuum packed only)',
+  'Food or drink past its expiry date',
   'Anything illegal under the laws of your country',
 ]
 

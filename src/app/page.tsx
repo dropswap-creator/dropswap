@@ -96,13 +96,16 @@ export default function HomePage() {
         <div className="relative px-8 py-16 text-center max-w-3xl mx-auto">
           <div className="inline-flex items-center gap-2 bg-white/20 rounded-full px-4 py-1.5 text-sm font-medium mb-6">
             <Recycle size={14} />
-            Swap. Don&apos;t Shop.
+            Trade like the old days. Keep it local.
           </div>
           <h1 className="text-5xl font-bold mb-4 leading-tight">
-            Drop what you don&apos;t need.<br />Swap for what you love.
+            Everything&apos;s gone up.<br />Your swaps don&apos;t have to.
           </h1>
-          <p className="text-indigo-100 text-xl mb-8">
-            Trade items of equal value with verified users worldwide — no money needed.
+          <p className="text-indigo-100 text-xl mb-3">
+            Cost of living crisis? Beat it. Trade what you have for what you need — no money, no middlemen, no government taking a cut.
+          </p>
+          <p className="text-indigo-200 text-base mb-8">
+            DropSwap brings back the oldest economy in the world — your community. Local. Fair. Free.
           </p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
             <Link href="/auth/signup" className="bg-white text-indigo-700 font-semibold px-8 py-3 rounded-xl hover:bg-indigo-50 transition-colors flex items-center justify-center gap-2">
@@ -134,32 +137,32 @@ export default function HomePage() {
       {/* Why DropSwap */}
       <div className="mb-14">
         <h2 className="text-2xl font-bold text-gray-900 text-center mb-2">Why DropSwap?</h2>
-        <p className="text-gray-500 text-center mb-8">The smarter way to get what you want</p>
+        <p className="text-gray-500 text-center mb-8">Because the old way of living actually worked</p>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
           {[
             {
               icon: <Coins size={28} className="text-yellow-500" />,
               bg: 'bg-yellow-50',
-              title: 'Save Money',
-              desc: "Why spend hard-earned cash when you can trade instead? Skip the price tags and keep your wallet full.",
+              title: 'Beat the Cost of Living',
+              desc: "Prices are rising. Wages aren't keeping up. Trade what you have, get what you need — keep every penny in your pocket.",
             },
             {
               icon: <PackageCheck size={28} className="text-blue-500" />,
               bg: 'bg-blue-50',
-              title: 'Declutter Fast',
-              desc: 'Clear your home of things that no longer serve you. Turn clutter into value instantly.',
+              title: 'Declutter & Gain',
+              desc: "One person's clutter is another's treasure. Clear your home and get something you actually want in return.",
             },
             {
               icon: <ShieldCheck size={28} className="text-green-500" />,
               bg: 'bg-green-50',
-              title: 'Swap Safely',
-              desc: 'Every user is verified, every swap is protected by our escrow system until completion.',
+              title: 'No Middlemen',
+              desc: 'No corporations, no taxes on trades, no algorithms deciding your worth. Just two people making a fair deal.',
             },
             {
               icon: <Users size={28} className="text-purple-500" />,
               bg: 'bg-purple-50',
-              title: 'Build Trust',
-              desc: 'Grow your reputation through ratings and reviews. Become a trusted swapper in your community.',
+              title: 'Keep It Local',
+              desc: 'Build real connections in your community. Trade with your neighbours. Keep value circulating where you live.',
             },
           ].map((w) => (
             <div key={w.title} className="bg-white rounded-2xl border border-gray-100 p-6 shadow-sm">
@@ -176,7 +179,7 @@ export default function HomePage() {
       {/* Categories */}
       <div className="mb-14">
         <h2 className="text-2xl font-bold text-gray-900 text-center mb-2">If it has value, you can DropSwap it</h2>
-        <p className="text-gray-500 text-center mb-8">Browse by category</p>
+        <p className="text-gray-500 text-center mb-8">From clothes to experiences — trade anything, keep the money in your community</p>
         <div className="grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-6 gap-3">
           {CATEGORIES.filter(c => c !== 'Other').map((cat) => (
             <button
@@ -226,8 +229,8 @@ export default function HomePage() {
 
       {/* Environmental Impact */}
       <div className="mb-14">
-        <h2 className="text-2xl font-bold text-gray-900 text-center mb-2">Better for your wallet. Better for the planet.</h2>
-        <p className="text-gray-500 text-center mb-8">Every swap makes a difference</p>
+        <h2 className="text-2xl font-bold text-gray-900 text-center mb-2">Good for your wallet. Good for the planet.</h2>
+        <p className="text-gray-500 text-center mb-8">Trade like the old days — circular, local, human</p>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
           {[
             {
