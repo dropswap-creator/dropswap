@@ -10,6 +10,11 @@ export type Category =
   | 'Collectibles'
   | 'Furniture'
   | 'Tools'
+  | 'Baby & Kids'
+  | 'Plants & Garden'
+  | 'Experiences & Services'
+  | 'Vehicles & Transport'
+  | 'Pet Supplies'
   | 'Other'
 
 export const CATEGORIES: Category[] = [
@@ -24,6 +29,11 @@ export const CATEGORIES: Category[] = [
   'Collectibles',
   'Furniture',
   'Tools',
+  'Baby & Kids',
+  'Plants & Garden',
+  'Experiences & Services',
+  'Vehicles & Transport',
+  'Pet Supplies',
   'Other',
 ]
 
