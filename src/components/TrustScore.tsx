@@ -1,12 +1,14 @@
 'use client'
 
 import { Star } from 'lucide-react'
+import Link from 'next/link'
 
 interface TrustScoreProps {
   score: number
   totalRatings: number
   completedSwaps: number
   size?: 'sm' | 'md' | 'lg'
+  profileId?: string
 }
 
 export default function TrustScore({
@@ -14,11 +16,12 @@ export default function TrustScore({
   totalRatings,
   completedSwaps,
   size = 'md',
+  profileId,
 }: TrustScoreProps) {
   const starSize = size === 'sm' ? 12 : size === 'lg' ? 20 : 16
   const textSize = size === 'sm' ? 'text-xs' : size === 'lg' ? 'text-base' : 'text-sm'
 
-  return (
+  const inner = (
     <div className="flex items-center gap-2">
       <div className="flex items-center gap-0.5">
         {[1, 2, 3, 4, 5].map((star) => (
@@ -46,4 +49,14 @@ export default function TrustScore({
       )}
     </div>
   )
+
+  if (profileId) {
+    return (
+      <Link href={`/profile/${profileId}`} className="hover:opacity-75 transition-opacity">
+        {inner}
+      </Link>
+    )
+  }
+
+  return inner
 }

@@ -65,6 +65,7 @@ export default function ItemCard({ item }: ItemCardProps) {
                 totalRatings={profile.total_ratings}
                 completedSwaps={profile.completed_swaps}
                 size="sm"
+                profileId={profile.id}
               />
             </div>
           )}
