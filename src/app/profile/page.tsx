@@ -101,7 +101,10 @@ export default function MyProfilePage() {
           </div>
 
           <div className="flex-1">
-            <h1 className="text-xl font-bold text-gray-900">{profile.username || profile.id}</h1>
+            <h1 className="text-xl font-bold text-gray-900">{profile.username || 'Set your display name'}</h1>
+            {!profile.username && (
+              <p className="text-xs text-amber-600 bg-amber-50 px-2 py-1 rounded-lg inline-block mt-1 mb-1">Fill in your name below so others can find you</p>
+            )}
             <TrustScore
               score={profile.trust_score}
               totalRatings={profile.total_ratings}
@@ -155,9 +158,15 @@ export default function MyProfilePage() {
 
       {/* My items */}
       <div>
-        <h2 className="text-lg font-bold text-gray-900 mb-4">My items ({items.length})</h2>
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-lg font-bold text-gray-900">My items ({items.length})</h2>
+          <a href="/items/new" className="text-sm bg-indigo-600 text-white px-3 py-1.5 rounded-lg hover:bg-indigo-700 transition-colors">+ Post item</a>
+        </div>
         {items.length === 0 ? (
-          <p className="text-gray-400 text-sm">No items posted yet.</p>
+          <div className="bg-white border border-dashed border-gray-200 rounded-2xl p-10 text-center">
+            <p className="text-gray-400 text-sm mb-3">You haven&apos;t posted any items yet.</p>
+            <a href="/items/new" className="inline-block bg-indigo-600 text-white text-sm font-medium px-4 py-2 rounded-xl hover:bg-indigo-700 transition-colors">Post your first item</a>
+          </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {items.map((item) => <ItemCard key={item.id} item={item} />)}
