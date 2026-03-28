@@ -15,6 +15,7 @@ export default function SignupPage() {
   const [agreedTerms, setAgreedTerms] = useState(false)
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
+  const [sent, setSent] = useState(false)
   const router = useRouter()
   const supabase = createClient()
 
@@ -40,8 +41,24 @@ export default function SignupPage() {
         .eq('id', data.user.id)
     }
 
-    router.push('/')
-    router.refresh()
+    setSent(true)
+    setLoading(false)
+  }
+
+  if (sent) {
+    return (
+      <div className="min-h-[70vh] flex items-center justify-center py-8">
+        <div className="bg-white p-8 rounded-2xl shadow-sm border border-gray-100 w-full max-w-sm text-center">
+          <div className="text-5xl mb-4">📬</div>
+          <h2 className="text-xl font-bold text-gray-900 mb-2">Check your email</h2>
+          <p className="text-gray-600 text-sm mb-2">We sent a verification link to <strong>{email}</strong></p>
+          <p className="text-gray-500 text-sm">Click the link in the email to activate your account. Check your spam folder if you don't see it.</p>
+          <Link href="/auth/login" className="mt-6 inline-block text-indigo-600 font-medium hover:underline text-sm">
+            Back to login
+          </Link>
+        </div>
+      </div>
+    )
   }
 
   return (
@@ -51,7 +68,7 @@ export default function SignupPage() {
           <ArrowLeftRight size={22} />
           DropSwap
         </div>
-        <p className="text-center text-xs text-gray-400 mb-6">Back to Barter. Swap More. Spend Less.</p>
+        <p className="text-center text-sm font-medium text-gray-700 mb-6">Trade like the old days. Keep it local.</p>
 
         <h1 className="text-2xl font-bold text-gray-900 text-center mb-6">Create account</h1>
 
@@ -63,7 +80,7 @@ export default function SignupPage() {
               required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full px-3 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm"
+              className="w-full px-3 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm text-gray-900 placeholder-gray-400"
               placeholder="you@example.com"
             />
           </div>
@@ -75,7 +92,7 @@ export default function SignupPage() {
               minLength={6}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full px-3 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm"
+              className="w-full px-3 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm text-gray-900 placeholder-gray-400"
               placeholder="At least 6 characters"
             />
           </div>
