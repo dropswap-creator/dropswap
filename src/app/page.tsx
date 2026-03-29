@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 import { createClient } from '@/lib/supabase'
 import ItemCard from '@/components/ItemCard'
 import { CATEGORIES } from '@/lib/types'
@@ -90,11 +91,11 @@ export default function HomePage() {
       {/* Hero */}
       <div className="bg-gradient-to-br from-indigo-600 via-indigo-700 to-purple-700 text-white rounded-3xl mb-12">
         <div className="px-8 py-16 text-center max-w-2xl mx-auto">
-          <h1 className="text-5xl font-bold mb-4 leading-tight">
-            Everything&apos;s gone up.<br />Your swaps don&apos;t have to.
-          </h1>
-          <p className="text-indigo-300 text-sm mb-1">One person&apos;s junk is another person&apos;s treasure. Everything has value to someone.</p>
-          <p className="text-indigo-400 text-xs mb-8">Back to Barter. Swap More. Spend Less. Forward Together.</p>
+          <div className="flex justify-center mb-6">
+            <Image src="/logo-full.png" alt="DropSwap" width={300} height={150} className="object-contain w-64 sm:w-80" />
+          </div>
+          <p className="text-indigo-200 text-lg mb-1">One person&apos;s junk is another person&apos;s treasure. Everything has value to someone.</p>
+          <p className="text-indigo-300 text-sm mb-8">Everything&apos;s gone up. Your swaps don&apos;t have to.</p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
             <Link href="/auth/signup" className="bg-white text-indigo-700 font-semibold px-8 py-3 rounded-xl hover:bg-indigo-50 transition-colors flex items-center justify-center gap-2">
               Start Swapping Free <ArrowRight size={16} />

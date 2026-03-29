@@ -35,7 +35,7 @@ export default function Navbar() {
     <nav className="bg-white border-b border-gray-100 sticky top-0 z-50">
       <div className="max-w-6xl mx-auto px-4 h-14 flex items-center justify-between">
         <Link href="/" className="flex items-center gap-2">
-          <Image src="/logo.png" alt="DropSwap" width={120} height={40} className="object-contain h-9 w-auto" />
+          <Image src="/logo-icon.png" alt="DropSwap" width={36} height={36} className="object-contain h-9 w-auto" />
         </Link>
 
         {/* Desktop nav */}
