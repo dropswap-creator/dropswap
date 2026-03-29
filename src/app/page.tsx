@@ -89,18 +89,18 @@ export default function HomePage() {
   return (
     <div>
       {/* Hero */}
-      <div className="bg-gradient-to-br from-indigo-600 via-indigo-700 to-purple-700 text-white rounded-3xl mb-12">
+      <div className="bg-white border border-gray-100 rounded-3xl mb-12 shadow-sm">
         <div className="px-8 py-16 text-center max-w-2xl mx-auto">
           <div className="flex justify-center mb-6">
             <Image src="/logo-full.png" alt="DropSwap" width={300} height={150} className="object-contain w-64 sm:w-80" />
           </div>
-          <p className="text-indigo-200 text-lg mb-1">One person&apos;s junk is another person&apos;s treasure. Everything has value to someone.</p>
-          <p className="text-indigo-300 text-sm mb-8">Everything&apos;s gone up. Your swaps don&apos;t have to.</p>
+          <p className="text-gray-600 text-lg mb-1">One person&apos;s junk is another person&apos;s treasure. Everything has value to someone.</p>
+          <p className="text-gray-400 text-sm mb-8">Everything&apos;s gone up. Your swaps don&apos;t have to.</p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
-            <Link href="/auth/signup" className="bg-white text-indigo-700 font-semibold px-8 py-3 rounded-xl hover:bg-indigo-50 transition-colors flex items-center justify-center gap-2">
+            <Link href="/auth/signup" className="bg-indigo-600 text-white font-semibold px-8 py-3 rounded-xl hover:bg-indigo-700 transition-colors flex items-center justify-center gap-2">
               Start Swapping Free <ArrowRight size={16} />
             </Link>
-            <Link href="/how-it-works" className="border border-white/40 text-white font-semibold px-8 py-3 rounded-xl hover:bg-white/10 transition-colors">
+            <Link href="/how-it-works" className="border border-gray-200 text-gray-700 font-semibold px-8 py-3 rounded-xl hover:bg-gray-50 transition-colors">
               How It Works
             </Link>
           </div>
