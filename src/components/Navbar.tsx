@@ -4,7 +4,8 @@ import Link from 'next/link'
 import { useRouter, usePathname } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase'
-import { ArrowLeftRight, Plus, User, LogOut, List, Gift, Menu, X } from 'lucide-react'
+import { Plus, User, LogOut, List, Gift, Menu, X } from 'lucide-react'
+import Image from 'next/image'
 import type { User as SupaUser } from '@supabase/supabase-js'
 
 export default function Navbar() {
@@ -33,9 +34,8 @@ export default function Navbar() {
   return (
     <nav className="bg-white border-b border-gray-100 sticky top-0 z-50">
       <div className="max-w-6xl mx-auto px-4 h-14 flex items-center justify-between">
-        <Link href="/" className="flex items-center gap-2 font-bold text-indigo-600 text-lg">
-          <ArrowLeftRight size={22} />
-          DropSwap
+        <Link href="/" className="flex items-center gap-2">
+          <Image src="/logo.png" alt="DropSwap" width={120} height={40} className="object-contain h-9 w-auto" />
         </Link>
 
         {/* Desktop nav */}

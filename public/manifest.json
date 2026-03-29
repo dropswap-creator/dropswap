@@ -1,7 +1,7 @@
 {
-  "name": "SwapShop",
-  "short_name": "SwapShop",
-  "description": "Swap items of equal value with people in your country. No money needed.",
+  "name": "DropSwap",
+  "short_name": "DropSwap",
+  "description": "Back to Barter. Swap More. Spend Less. Forward Together.",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#f9fafb",
@@ -9,14 +9,8 @@
   "orientation": "portrait",
   "icons": [
     {
-      "src": "/icon-192.png",
-      "sizes": "192x192",
-      "type": "image/png",
-      "purpose": "any maskable"
-    },
-    {
-      "src": "/icon-512.png",
-      "sizes": "512x512",
+      "src": "/logo.png",
+      "sizes": "any",
       "type": "image/png",
       "purpose": "any maskable"
     }
