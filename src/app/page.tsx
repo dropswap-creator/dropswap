@@ -92,7 +92,7 @@ export default function HomePage() {
       <div className="bg-gradient-to-br from-indigo-600 via-indigo-700 to-purple-700 rounded-3xl mb-12">
         <div className="px-8 py-16 text-center max-w-2xl mx-auto">
           <div className="flex justify-center mb-4">
-            <Image src="/logo-full.png" alt="DropSwap" width={400} height={200} className="object-contain w-80 sm:w-96" />
+            <Image src="/logo-full.png" alt="DropSwap" width={600} height={300} className="object-contain w-full max-w-lg" />
           </div>
           <p className="text-indigo-200 text-base mb-8">One person&apos;s junk is another&apos;s treasure.</p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
