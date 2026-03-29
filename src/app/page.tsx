@@ -90,7 +90,7 @@ export default function HomePage() {
     <div>
       {/* Hero */}
       <div className="bg-gradient-to-br from-indigo-600 via-indigo-700 to-purple-700 rounded-3xl mb-12">
-        <div className="px-8 py-16 text-center max-w-2xl mx-auto">
+        <div className="px-8 py-8 text-center max-w-2xl mx-auto">
           <div className="flex justify-center mb-4">
             <Image src="/logo-full.png" alt="DropSwap" width={600} height={300} className="object-contain w-full max-w-lg" />
           </div>
