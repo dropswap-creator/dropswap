@@ -4,11 +4,12 @@ import Link from 'next/link'
 import { useRouter, usePathname } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase'
-import { ArrowLeftRight, Plus, User, LogOut, List, Gift } from 'lucide-react'
+import { ArrowLeftRight, Plus, User, LogOut, List, Gift, Menu, X } from 'lucide-react'
 import type { User as SupaUser } from '@supabase/supabase-js'
 
 export default function Navbar() {
   const [user, setUser] = useState<SupaUser | null>(null)
+  const [open, setOpen] = useState(false)
   const router = useRouter()
   const pathname = usePathname()
   const supabase = createClient()
@@ -20,6 +21,8 @@ export default function Navbar() {
     })
     return () => subscription.unsubscribe()
   }, [])
+
+  useEffect(() => { setOpen(false) }, [pathname])
 
   async function signOut() {
     await supabase.auth.signOut()
@@ -35,74 +38,72 @@ export default function Navbar() {
           DropSwap
         </Link>
 
-        <div className="flex items-center gap-3">
+        {/* Desktop nav */}
+        <div className="hidden sm:flex items-center gap-3">
           {user ? (
             <>
-              <Link
-                href="/items/new"
-                className="flex items-center gap-1.5 bg-indigo-600 text-white text-sm font-medium px-3 py-1.5 rounded-lg hover:bg-indigo-700 transition-colors"
-              >
-                <Plus size={16} />
-                Post Item
+              <Link href="/items/new" className="flex items-center gap-1.5 bg-indigo-600 text-white text-sm font-medium px-3 py-1.5 rounded-lg hover:bg-indigo-700 transition-colors">
+                <Plus size={16} /> Post Item
               </Link>
-              <Link
-                href="/giveaways"
-                className={`flex items-center gap-1.5 text-sm px-3 py-1.5 rounded-lg transition-colors ${
-                  pathname.startsWith('/giveaways')
-                    ? 'text-pink-600 bg-pink-50'
-                    : 'text-gray-600 hover:bg-gray-50'
-                }`}
-              >
-                <Gift size={16} />
-                Giveaways
+              <Link href="/giveaways" className={`flex items-center gap-1.5 text-sm px-3 py-1.5 rounded-lg transition-colors ${pathname.startsWith('/giveaways') ? 'text-pink-600 bg-pink-50' : 'text-gray-600 hover:bg-gray-50'}`}>
+                <Gift size={16} /> Giveaways
               </Link>
-              <Link
-                href="/swaps"
-                className={`flex items-center gap-1.5 text-sm px-3 py-1.5 rounded-lg transition-colors ${
-                  pathname.startsWith('/swaps')
-                    ? 'text-indigo-600 bg-indigo-50'
-                    : 'text-gray-600 hover:bg-gray-50'
-                }`}
-              >
-                <List size={16} />
-                My Swaps
+              <Link href="/swaps" className={`flex items-center gap-1.5 text-sm px-3 py-1.5 rounded-lg transition-colors ${pathname.startsWith('/swaps') ? 'text-indigo-600 bg-indigo-50' : 'text-gray-600 hover:bg-gray-50'}`}>
+                <List size={16} /> My Swaps
               </Link>
-              <Link
-                href="/profile"
-                className={`flex items-center gap-1.5 text-sm px-3 py-1.5 rounded-lg transition-colors ${
-                  pathname === '/profile'
-                    ? 'text-indigo-600 bg-indigo-50'
-                    : 'text-gray-600 hover:bg-gray-50'
-                }`}
-              >
-                <User size={16} />
-                Profile
+              <Link href="/profile" className={`flex items-center gap-1.5 text-sm px-3 py-1.5 rounded-lg transition-colors ${pathname === '/profile' ? 'text-indigo-600 bg-indigo-50' : 'text-gray-600 hover:bg-gray-50'}`}>
+                <User size={16} /> Profile
               </Link>
-              <button
-                onClick={signOut}
-                className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-700 px-2 py-1.5 rounded-lg hover:bg-gray-50 transition-colors"
-              >
+              <button onClick={signOut} className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-700 px-2 py-1.5 rounded-lg hover:bg-gray-50 transition-colors">
                 <LogOut size={16} />
               </button>
             </>
           ) : (
             <>
-              <Link
-                href="/auth/login"
-                className="text-sm text-gray-600 hover:text-gray-900 px-3 py-1.5"
-              >
-                Log in
-              </Link>
-              <Link
-                href="/auth/signup"
-                className="text-sm bg-indigo-600 text-white px-3 py-1.5 rounded-lg hover:bg-indigo-700 transition-colors"
-              >
-                Sign up
-              </Link>
+              <Link href="/auth/login" className="text-sm text-gray-600 hover:text-gray-900 px-3 py-1.5">Log in</Link>
+              <Link href="/auth/signup" className="text-sm bg-indigo-600 text-white px-3 py-1.5 rounded-lg hover:bg-indigo-700 transition-colors">Sign up</Link>
             </>
           )}
         </div>
+
+        {/* Mobile hamburger */}
+        <button
+          className="sm:hidden p-2 rounded-lg text-gray-600 hover:bg-gray-50 transition-colors"
+          onClick={() => setOpen(!open)}
+        >
+          {open ? <X size={22} /> : <Menu size={22} />}
+        </button>
       </div>
+
+      {/* Mobile menu */}
+      {open && (
+        <div className="sm:hidden bg-white border-t border-gray-100 px-4 py-3 space-y-1">
+          {user ? (
+            <>
+              <Link href="/items/new" className="flex items-center gap-3 px-3 py-3 bg-indigo-600 text-white rounded-xl font-medium text-sm">
+                <Plus size={18} /> Post Item
+              </Link>
+              <Link href="/giveaways" className="flex items-center gap-3 px-3 py-3 text-gray-700 rounded-xl text-sm hover:bg-gray-50">
+                <Gift size={18} /> Giveaways
+              </Link>
+              <Link href="/swaps" className="flex items-center gap-3 px-3 py-3 text-gray-700 rounded-xl text-sm hover:bg-gray-50">
+                <List size={18} /> My Swaps
+              </Link>
+              <Link href="/profile" className="flex items-center gap-3 px-3 py-3 text-gray-700 rounded-xl text-sm hover:bg-gray-50">
+                <User size={18} /> Profile
+              </Link>
+              <button onClick={signOut} className="flex items-center gap-3 px-3 py-3 text-red-500 rounded-xl text-sm hover:bg-red-50 w-full">
+                <LogOut size={18} /> Sign out
+              </button>
+            </>
+          ) : (
+            <>
+              <Link href="/auth/login" className="flex items-center px-3 py-3 text-gray-700 rounded-xl text-sm hover:bg-gray-50">Log in</Link>
+              <Link href="/auth/signup" className="flex items-center px-3 py-3 bg-indigo-600 text-white rounded-xl text-sm font-medium">Sign up free</Link>
+            </>
+          )}
+        </div>
+      )}
     </nav>
   )
 }

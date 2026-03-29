@@ -5,17 +5,18 @@
       <stop offset="100%" style="stop-color:#7C3AED"/>
     </linearGradient>
   </defs>
+
+  <!-- Background -->
   <rect width="400" height="400" rx="80" fill="url(#bg)"/>
 
-  <!-- Arrow Right (top) -->
-  <g transform="translate(200, 175)" stroke="white" stroke-width="16" stroke-linecap="round" stroke-linejoin="round" fill="none">
-    <line x1="-90" y1="0" x2="65" y2="0"/>
-    <polyline points="35,-35 65,0 35,35"/>
-  </g>
+  <!-- Drop shape left (giving) -->
+  <path d="M140,80 C140,80 95,145 95,180 C95,206 115,228 140,228 C165,228 185,206 185,180 C185,145 140,80 140,80 Z"
+    fill="white" opacity="1"/>
 
-  <!-- Arrow Left (bottom) -->
-  <g transform="translate(200, 255)" stroke="white" stroke-width="16" stroke-linecap="round" stroke-linejoin="round" fill="none" opacity="0.75">
-    <line x1="90" y1="0" x2="-65" y2="0"/>
-    <polyline points="-35,-35 -65,0 -35,35"/>
-  </g>
+  <!-- Drop shape right (receiving) -->
+  <path d="M265,172 C265,172 220,237 220,272 C220,298 240,320 265,320 C290,320 310,298 310,272 C310,237 265,172 265,172 Z"
+    fill="white" opacity="0.7"/>
+
+  <!-- Connecting dot -->
+  <circle cx="202" cy="224" r="12" fill="white" opacity="0.45"/>
 </svg>
