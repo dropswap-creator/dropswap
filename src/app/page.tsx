@@ -94,8 +94,7 @@ export default function HomePage() {
           <div className="flex justify-center mb-6">
             <Image src="/logo-full.png" alt="DropSwap" width={300} height={150} className="object-contain w-64 sm:w-80" />
           </div>
-          <p className="text-gray-600 text-lg mb-1">One person&apos;s junk is another person&apos;s treasure. Everything has value to someone.</p>
-          <p className="text-gray-400 text-sm mb-8">Everything&apos;s gone up. Your swaps don&apos;t have to.</p>
+          <p className="text-gray-600 text-lg mb-8">One person&apos;s junk is another person&apos;s treasure. Everything has value.</p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
             <Link href="/auth/signup" className="bg-indigo-600 text-white font-semibold px-8 py-3 rounded-xl hover:bg-indigo-700 transition-colors flex items-center justify-center gap-2">
               Start Swapping Free <ArrowRight size={16} />
