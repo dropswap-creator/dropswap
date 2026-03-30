@@ -4,9 +4,10 @@ import Link from 'next/link'
 import { useRouter, usePathname } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase'
-import { Plus, User, LogOut, List, Gift, Menu, X } from 'lucide-react'
+import { Plus, User, LogOut, List, Gift, Menu, X, Search } from 'lucide-react'
 import Image from 'next/image'
 import type { User as SupaUser } from '@supabase/supabase-js'
+import NotificationBell from '@/components/NotificationBell'
 
 export default function Navbar() {
   const [user, setUser] = useState<SupaUser | null>(null)
@@ -42,6 +43,9 @@ export default function Navbar() {
         <div className="hidden sm:flex items-center gap-3">
           {user ? (
             <>
+              <Link href="/search" className={`flex items-center gap-1.5 text-sm px-3 py-1.5 rounded-lg transition-colors ${pathname === '/search' ? 'text-indigo-600 bg-indigo-50' : 'text-gray-600 hover:bg-gray-50'}`}>
+                <Search size={16} /> Search
+              </Link>
               <Link href="/items/new" className="flex items-center gap-1.5 bg-indigo-600 text-white text-sm font-medium px-3 py-1.5 rounded-lg hover:bg-indigo-700 transition-colors">
                 <Plus size={16} /> Post Item
               </Link>
@@ -54,6 +58,7 @@ export default function Navbar() {
               <Link href="/profile" className={`flex items-center gap-1.5 text-sm px-3 py-1.5 rounded-lg transition-colors ${pathname === '/profile' ? 'text-indigo-600 bg-indigo-50' : 'text-gray-600 hover:bg-gray-50'}`}>
                 <User size={16} /> Profile
               </Link>
+              <NotificationBell userId={user.id} />
               <button onClick={signOut} className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-700 px-2 py-1.5 rounded-lg hover:bg-gray-50 transition-colors">
                 <LogOut size={16} />
               </button>
@@ -80,6 +85,9 @@ export default function Navbar() {
         <div className="sm:hidden bg-white border-t border-gray-100 px-4 py-3 space-y-1">
           {user ? (
             <>
+              <Link href="/search" className="flex items-center gap-3 px-3 py-3 text-gray-700 rounded-xl text-sm hover:bg-gray-50">
+                <Search size={18} /> Search
+              </Link>
               <Link href="/items/new" className="flex items-center gap-3 px-3 py-3 bg-indigo-600 text-white rounded-xl font-medium text-sm">
                 <Plus size={18} /> Post Item
               </Link>

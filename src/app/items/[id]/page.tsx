@@ -8,7 +8,7 @@ import { createClient } from '@/lib/supabase'
 import TrustScore from '@/components/TrustScore'
 import ItemCard from '@/components/ItemCard'
 import type { Item, Profile } from '@/lib/types'
-import { MapPin, Tag, ArrowLeftRight, Trash2, ChevronLeft, ChevronRight } from 'lucide-react'
+import { MapPin, Tag, ArrowLeftRight, Trash2, ChevronLeft, ChevronRight, Flag, Pencil } from 'lucide-react'
 
 export default function ItemPage() {
   const { id } = useParams<{ id: string }>()
@@ -25,6 +25,8 @@ export default function ItemPage() {
   const [alreadyOffered, setAlreadyOffered] = useState(false)
   const [imgIndex, setImgIndex] = useState(0)
   const [loading, setLoading] = useState(true)
+  const [reported, setReported] = useState(false)
+  const [reporting, setReporting] = useState(false)
 
   useEffect(() => {
     async function load() {
@@ -77,6 +79,20 @@ export default function ItemPage() {
       setOfferSent(true)
     }
     setOffering(false)
+  }
+
+  async function reportItem() {
+    if (!currentUser || !item) return
+    const reason = prompt('Why are you reporting this item? (e.g. spam, offensive, fake)')
+    if (!reason?.trim()) return
+    setReporting(true)
+    await supabase.from('reports').insert({
+      item_id: item.id,
+      reporter_id: currentUser,
+      reason: reason.trim(),
+    })
+    setReported(true)
+    setReporting(false)
   }
 
   async function deleteItem() {
@@ -176,13 +192,21 @@ export default function ItemPage() {
 
           {/* Actions */}
           {isOwner ? (
-            <button
-              onClick={deleteItem}
-              className="flex items-center gap-2 text-red-500 hover:text-red-600 text-sm"
-            >
-              <Trash2 size={16} />
-              Delete item
-            </button>
+            <div className="flex gap-3">
+              <Link
+                href={`/items/${item.id}/edit`}
+                className="flex items-center gap-1.5 text-sm text-indigo-600 hover:text-indigo-700"
+              >
+                <Pencil size={15} /> Edit
+              </Link>
+              <button
+                onClick={deleteItem}
+                className="flex items-center gap-2 text-red-500 hover:text-red-600 text-sm"
+              >
+                <Trash2 size={16} />
+                Delete
+              </button>
+            </div>
           ) : currentUser && item.status === 'available' ? (
             <div className="space-y-3">
               {alreadyOffered ? (
@@ -238,6 +262,23 @@ export default function ItemPage() {
           ) : (
             <div className="text-sm text-gray-400 bg-gray-50 px-4 py-3 rounded-xl">
               This item is currently {item.status === 'in_swap' ? 'in a swap' : 'already swapped'}.
+            </div>
+          )}
+
+          {/* Report */}
+          {currentUser && !isOwner && (
+            <div className="pt-2">
+              {reported ? (
+                <p className="text-xs text-gray-400">Thanks — we&apos;ll review this item.</p>
+              ) : (
+                <button
+                  onClick={reportItem}
+                  disabled={reporting}
+                  className="flex items-center gap-1.5 text-xs text-gray-400 hover:text-red-500 transition-colors"
+                >
+                  <Flag size={13} /> Report this item
+                </button>
+              )}
             </div>
           )}
         </div>
