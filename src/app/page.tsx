@@ -89,17 +89,17 @@ export default function HomePage() {
   return (
     <div>
       {/* Hero */}
-      <div className="bg-gradient-to-br from-indigo-600 via-indigo-700 to-purple-700 rounded-3xl mb-12">
+      <div className="bg-white rounded-3xl mb-12 border border-gray-100 shadow-sm">
         <div className="px-8 py-8 text-center max-w-2xl mx-auto">
           <div className="flex justify-center mb-4">
             <Image src="/logo-full.png" alt="DropSwap" width={600} height={300} className="object-contain w-full max-w-lg" />
           </div>
-          <p className="text-indigo-200 text-base mb-8">One person&apos;s junk is another&apos;s treasure.</p>
+          <p className="text-gray-500 text-base mb-8">One person&apos;s junk is another&apos;s treasure.</p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
-            <Link href="/auth/signup" className="bg-white text-indigo-700 font-semibold px-8 py-3 rounded-xl hover:bg-indigo-50 transition-colors flex items-center justify-center gap-2">
+            <Link href="/auth/signup" className="bg-indigo-600 text-white font-semibold px-8 py-3 rounded-xl hover:bg-indigo-700 transition-colors flex items-center justify-center gap-2">
               Start Swapping Free <ArrowRight size={16} />
             </Link>
-            <Link href="/how-it-works" className="border border-white/40 text-white font-semibold px-8 py-3 rounded-xl hover:bg-white/10 transition-colors">
+            <Link href="/how-it-works" className="border border-gray-200 text-gray-700 font-semibold px-8 py-3 rounded-xl hover:bg-gray-50 transition-colors">
               How It Works
             </Link>
           </div>
