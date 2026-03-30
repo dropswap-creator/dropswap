@@ -35,10 +35,7 @@ export default function SignupPage() {
     }
 
     if (data.user) {
-      await supabase
-        .from('profiles')
-        .update({ country })
-        .eq('id', data.user.id)
+      await supabase.from('profiles').upsert({ id: data.user.id, country })
     }
 
     setSent(true)
