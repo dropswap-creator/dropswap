@@ -15,6 +15,7 @@ export default function NewGiveawayPage() {
   const [error, setError] = useState('')
   const [userId, setUserId] = useState<string | null>(null)
   const [userCountry, setUserCountry] = useState('')
+  const [coversDelivery, setCoversDelivery] = useState(false)
   const fileRef = useRef<HTMLInputElement>(null)
   const router = useRouter()
   const supabase = createClient()
@@ -71,6 +72,7 @@ export default function NewGiveawayPage() {
       category: 'Other',
       images: uploadedUrls,
       country: userCountry,
+      covers_delivery: coversDelivery,
     })
 
     if (insertError) { setError(insertError.message); setLoading(false); return }
@@ -126,8 +128,20 @@ export default function NewGiveawayPage() {
         </div>
 
         <div className="bg-pink-50 border border-pink-100 rounded-xl p-4 text-sm text-pink-800">
-          <strong>Note:</strong> Giveaways are free to post. The person who claims your item will pay a £0.99 admin fee to DropSwap. You receive nothing — this is a pure giveaway.
+          <strong>Note:</strong> Giveaways are free to post. The person who claims your item pays a £0.99 admin fee to DropSwap. By default, the receiver covers delivery costs.
         </div>
+
+        <label className="flex items-start gap-3 cursor-pointer">
+          <input
+            type="checkbox"
+            checked={coversDelivery}
+            onChange={(e) => setCoversDelivery(e.target.checked)}
+            className="mt-0.5 w-4 h-4 accent-pink-500 shrink-0"
+          />
+          <span className="text-sm text-gray-700">
+            <strong>I'll cover delivery</strong> — I will pay postage to send this item to the claimer
+          </span>
+        </label>
 
         {error && <p className="text-red-500 text-sm bg-red-50 px-3 py-2 rounded-lg">{error}</p>}
 

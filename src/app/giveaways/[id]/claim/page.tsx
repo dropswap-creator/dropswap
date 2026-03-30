@@ -77,8 +77,17 @@ export default function ClaimGiveawayPage() {
             <MapPin size={12} /> {item.country}
           </div>
 
-          <div className="bg-pink-50 border border-pink-100 rounded-xl p-4 mb-5 text-sm text-pink-800">
-            <strong>How it works:</strong> This item is being given away free. You pay a one-time £0.99 admin fee to claim it — then arrange collection or postage directly with the giver.
+          <div className="bg-pink-50 border border-pink-100 rounded-xl p-4 mb-5 text-sm text-pink-800 space-y-2">
+            <p><strong>How it works:</strong> This item is being given away free. You pay a one-time £0.99 admin fee to claim it.</p>
+            {(item as any).covers_delivery ? (
+              <p className="text-green-700 bg-green-50 border border-green-100 rounded-lg px-3 py-2">
+                ✅ <strong>Giver covers delivery</strong> — the giver will post this to you at no extra cost.
+              </p>
+            ) : (
+              <p className="text-amber-700 bg-amber-50 border border-amber-100 rounded-lg px-3 py-2">
+                📦 <strong>You cover delivery</strong> — you'll need to arrange and pay for postage with the giver.
+              </p>
+            )}
           </div>
 
           {error && <p className="text-red-500 text-sm bg-red-50 px-3 py-2 rounded-lg mb-4">{error}</p>}
