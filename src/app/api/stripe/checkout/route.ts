@@ -10,17 +10,9 @@ export async function POST(req: NextRequest) {
     let amount: number
     let description: string
 
-    if (type === 'giveaway') {
+    if (type === 'giveaway' || type === 'swap_fee') {
       amount = 99 // £0.99 in pence
-      description = 'DropSwap — Giveaway claim fee'
-    } else if (type === 'completion') {
-      amount = 100 // £1.00 in pence
-      description = 'DropSwap — Swap completion fee'
-    } else if (type === 'bond') {
-      const bondPercent = itemValue * 0.1
-      const bondAmount = Math.min(Math.max(bondPercent, 2), 20)
-      amount = Math.round(bondAmount * 100) // convert to pence
-      description = `DropSwap — Swap bond (refundable on completion)`
+      description = type === 'giveaway' ? 'DropSwap — Giveaway claim fee' : 'DropSwap — Swap fee'
     } else {
       return NextResponse.json({ error: 'Invalid payment type' }, { status: 400 })
     }
@@ -42,7 +34,7 @@ export async function POST(req: NextRequest) {
       mode: 'payment',
       success_url: type === 'giveaway'
         ? `${process.env.NEXT_PUBLIC_SITE_URL}/giveaways/${itemId}/claimed`
-        : `${process.env.NEXT_PUBLIC_SITE_URL}/swaps/${swapId}?payment=success&type=${type}`,
+        : `${process.env.NEXT_PUBLIC_SITE_URL}/swaps/${swapId}?payment=success`,
       cancel_url: type === 'giveaway'
         ? `${process.env.NEXT_PUBLIC_SITE_URL}/giveaways/${itemId}/claim`
         : `${process.env.NEXT_PUBLIC_SITE_URL}/swaps/${swapId}?payment=cancelled`,

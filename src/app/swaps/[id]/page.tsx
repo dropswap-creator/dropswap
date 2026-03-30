@@ -32,6 +32,8 @@ export default function SwapDetailPage() {
   const router = useRouter()
   const supabase = createClient()
   const bottomRef = useRef<HTMLDivElement>(null)
+  const searchParams = typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : null
+  const paymentSuccess = searchParams?.get('payment') === 'success'
 
   const [swap, setSwap] = useState<Swap | null>(null)
   const [messages, setMessages] = useState<Message[]>([])
@@ -42,7 +44,7 @@ export default function SwapDetailPage() {
   const [ratingComment, setRatingComment] = useState('')
   const [myRating, setMyRating] = useState<Rating | null>(null)
   const [loading, setLoading] = useState(true)
-  const [declaredValue, setDeclaredValue] = useState<number>(0)
+  const [paidFee, setPaidFee] = useState(false)
 
   async function loadSwap() {
     const { data } = await supabase
@@ -66,6 +68,15 @@ export default function SwapDetailPage() {
       setUserId(user.id)
 
       await loadSwap()
+
+      // Auto-accept if receiver returning from successful payment
+      if (paymentSuccess) {
+        const { data: swapData } = await supabase.from('swaps').select('status, receiver_id').eq('id', id).single()
+        if (swapData?.status === 'pending' && swapData?.receiver_id === user.id) {
+          await supabase.from('swaps').update({ status: 'accepted', updated_at: new Date().toISOString() }).eq('id', id)
+        }
+        setPaidFee(true)
+      }
 
       const { data: msgs } = await supabase
         .from('messages')
@@ -315,57 +326,34 @@ export default function SwapDetailPage() {
         </div>
       )}
 
-      {/* Swap Bond Payment */}
-      {swap.status === 'accepted' && userId && (
-        <div className="bg-amber-50 border border-amber-200 rounded-2xl p-5">
-          <h2 className="font-semibold text-gray-900 mb-1">Swap Bond Required</h2>
+      {/* Requester fee — pay £0.99 to send offer */}
+      {swap.status === 'pending' && isRequester && !paidFee && userId && (
+        <div className="bg-indigo-50 border border-indigo-200 rounded-2xl p-5">
+          <h2 className="font-semibold text-gray-900 mb-1">Pay £0.99 to send your offer</h2>
           <p className="text-sm text-gray-600 mb-4">
-            Both parties must pay a refundable swap bond before shipping. The bond is 10% of your item&apos;s declared value (min £2, max £20). It is returned automatically once the swap completes.
+            A small £0.99 fee is charged to each party to confirm a swap. This keeps DropSwap running and filters out time-wasters.
           </p>
-          <div className="flex flex-col sm:flex-row gap-3 items-start">
-            <div>
-              <label className="text-xs text-gray-500 mb-1 block">Your item&apos;s estimated value (£)</label>
-              <input
-                type="number"
-                min="1"
-                max="500"
-                placeholder="e.g. 25"
-                value={declaredValue || ''}
-                onChange={(e) => setDeclaredValue(Number(e.target.value))}
-                className="px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 w-32"
-              />
-              {declaredValue > 0 && (
-                <p className="text-xs text-gray-500 mt-1">
-                  Bond: £{Math.min(Math.max(declaredValue * 0.1, 2), 20).toFixed(2)} (refundable)
-                </p>
-              )}
-            </div>
-            <div className="mt-5">
-              <StripePayButton
-                type="bond"
-                swapId={id}
-                userId={userId}
-                itemValue={declaredValue}
-                label={declaredValue > 0 ? `Pay £${Math.min(Math.max(declaredValue * 0.1, 2), 20).toFixed(2)} Bond` : 'Enter value above'}
-              />
-            </div>
-          </div>
-          <p className="text-xs text-amber-700 mt-3">⚠️ Shipping will not be confirmed until both parties have paid their bond.</p>
+          <StripePayButton
+            type="swap_fee"
+            swapId={id}
+            userId={userId}
+            label="Pay £0.99 & Send Offer"
+          />
         </div>
       )}
 
-      {/* Completion Fee */}
-      {swap.status === 'completed' && isReceiver && userId && (
-        <div className="bg-green-50 border border-green-200 rounded-2xl p-5">
-          <h2 className="font-semibold text-gray-900 mb-1">Swap Complete!</h2>
+      {/* Receiver fee — pay £0.99 to accept */}
+      {swap.status === 'pending' && isReceiver && !paidFee && userId && (
+        <div className="bg-indigo-50 border border-indigo-200 rounded-2xl p-5">
+          <h2 className="font-semibold text-gray-900 mb-1">Pay £0.99 to accept this swap</h2>
           <p className="text-sm text-gray-600 mb-4">
-            A small £1.00 platform fee applies to completed swaps, paid by the receiver. This helps keep DropSwap free for everyone.
+            A small £0.99 fee is charged to each party. This keeps DropSwap running and filters out time-wasters.
           </p>
           <StripePayButton
-            type="completion"
+            type="swap_fee"
             swapId={id}
             userId={userId}
-            label="Pay £1.00 Completion Fee"
+            label="Pay £0.99 & Accept Swap"
           />
         </div>
       )}
