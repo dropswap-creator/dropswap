@@ -36,6 +36,11 @@ export default function SignupPage() {
 
     if (data.user) {
       await supabase.from('profiles').upsert({ id: data.user.id, country })
+      await fetch('/api/email', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ type: 'welcome', to: email }),
+      })
     }
 
     setSent(true)
