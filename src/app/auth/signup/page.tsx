@@ -9,6 +9,7 @@ import { ArrowLeftRight } from 'lucide-react'
 
 export default function SignupPage() {
   const [email, setEmail] = useState('')
+  const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [country, setCountry] = useState('')
   const [agreedAge, setAgreedAge] = useState(false)
@@ -26,6 +27,8 @@ export default function SignupPage() {
 
   async function handleSignup(e: React.FormEvent) {
     e.preventDefault()
+    if (!username.trim()) { setError('Please enter a username'); return }
+    if (!/^[a-zA-Z0-9_]{3,20}$/.test(username)) { setError('Username must be 3–20 characters, letters/numbers/underscores only'); return }
     if (!country) { setError('Please select your country'); return }
     if (!agreedAge) { setError('You must confirm you are 18 or older'); return }
     if (!agreedTerms) { setError('You must agree to the Terms & Conditions'); return }
@@ -35,7 +38,7 @@ export default function SignupPage() {
     const res = await fetch('/api/auth/signup', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, password, country }),
+      body: JSON.stringify({ email, password, country, username }),
     })
     const result = await res.json()
     if (!res.ok) {
@@ -85,6 +88,19 @@ export default function SignupPage() {
               className="w-full px-3 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm text-gray-900 placeholder-gray-400"
               placeholder="you@example.com"
             />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Username</label>
+            <input
+              type="text"
+              required
+              value={username}
+              onChange={(e) => setUsername(e.target.value.toLowerCase().replace(/[^a-z0-9_]/g, ''))}
+              className="w-full px-3 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm text-gray-900 placeholder-gray-400"
+              placeholder="e.g. john_smith"
+              maxLength={20}
+            />
+            <p className="text-xs text-gray-400 mt-1">3–20 characters, letters/numbers/underscores</p>
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Password</label>

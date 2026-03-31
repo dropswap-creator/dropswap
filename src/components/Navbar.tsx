@@ -71,13 +71,16 @@ export default function Navbar() {
           )}
         </div>
 
-        {/* Mobile hamburger */}
-        <button
-          className="sm:hidden p-2 rounded-lg text-gray-600 hover:bg-gray-50 transition-colors"
-          onClick={() => setOpen(!open)}
-        >
-          {open ? <X size={22} /> : <Menu size={22} />}
-        </button>
+        {/* Mobile right side */}
+        <div className="sm:hidden flex items-center gap-1">
+          {user && <NotificationBell userId={user.id} />}
+          <button
+            className="p-2 rounded-lg text-gray-600 hover:bg-gray-50 transition-colors"
+            onClick={() => setOpen(!open)}
+          >
+            {open ? <X size={22} /> : <Menu size={22} />}
+          </button>
+        </div>
       </div>
 
       {/* Mobile menu */}

@@ -8,10 +8,21 @@ const supabaseAdmin = createClient(
 )
 
 export async function POST(req: NextRequest) {
-  const { email, password, country } = await req.json()
+  const { email, password, country, username } = await req.json()
 
-  if (!email || !password || !country) {
+  if (!email || !password || !country || !username) {
     return NextResponse.json({ error: 'Missing fields' }, { status: 400 })
+  }
+
+  // Check username is unique
+  const { data: existing } = await supabaseAdmin
+    .from('profiles')
+    .select('id')
+    .eq('username', username)
+    .maybeSingle()
+
+  if (existing) {
+    return NextResponse.json({ error: 'Username already taken' }, { status: 400 })
   }
 
   // Create user with email_confirm: true — no confirmation email sent
@@ -26,7 +37,7 @@ export async function POST(req: NextRequest) {
   }
 
   // Create profile
-  await supabaseAdmin.from('profiles').upsert({ id: data.user.id, country })
+  await supabaseAdmin.from('profiles').upsert({ id: data.user.id, country, username })
 
   return NextResponse.json({ ok: true })
 }
