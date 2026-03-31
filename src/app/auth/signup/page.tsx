@@ -62,8 +62,7 @@ export default function SignupPage() {
       body: JSON.stringify({ type: 'welcome', to: email }),
     })
 
-    router.push('/')
-    router.refresh()
+    router.push('/welcome')
   }
 
   return (

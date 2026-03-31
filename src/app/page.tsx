@@ -323,17 +323,29 @@ export default function HomePage() {
                 ))}
               </div>
             ) : filtered.length === 0 ? (
-              <div className="text-center py-20 text-gray-400">
-                <p className="text-5xl mb-4">📦</p>
-                <p className="text-lg font-medium">No items found</p>
-                <p className="text-sm mt-1">
-                  {userCountry
-                    ? `No items available in ${userCountry} yet. Be the first to post!`
-                    : 'Sign up to see items in your country.'}
+              <div className="text-center py-16">
+                <div className="text-6xl mb-4">{search || category ? '🔍' : '🌱'}</div>
+                <h3 className="text-lg font-bold text-gray-900 mb-2">
+                  {search || category ? 'No items match your search' : `No items in ${userCountry} yet`}
+                </h3>
+                <p className="text-gray-500 text-sm mb-6 max-w-xs mx-auto">
+                  {search || category
+                    ? 'Try different keywords or browse all categories.'
+                    : 'Be the first person in your country to post something. It only takes a minute.'}
                 </p>
-                <Link href="/items/new" className="mt-4 inline-block bg-indigo-600 text-white text-sm font-semibold px-6 py-2.5 rounded-xl hover:bg-indigo-700 transition-colors">
-                  Post the First Item
-                </Link>
+                <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                  {(search || category) && (
+                    <button
+                      onClick={() => { setSearch(''); setCategory('') }}
+                      className="border border-gray-200 text-gray-700 font-medium px-5 py-2.5 rounded-xl hover:bg-gray-50 transition-colors text-sm"
+                    >
+                      Clear filters
+                    </button>
+                  )}
+                  <Link href="/items/new" className="bg-indigo-600 text-white font-semibold px-6 py-2.5 rounded-xl hover:bg-indigo-700 transition-colors text-sm">
+                    Post the First Item
+                  </Link>
+                </div>
               </div>
             ) : (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">

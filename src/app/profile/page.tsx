@@ -72,8 +72,28 @@ export default function MyProfilePage() {
   if (loading) return <div className="animate-pulse bg-white rounded-2xl h-64" />
   if (!profile) return null
 
+  const incomplete = !profile.avatar_url || !profile.bio
+  const completeness = [!!profile.username, !!profile.avatar_url, !!profile.bio, items.length > 0].filter(Boolean).length
+
   return (
     <div className="max-w-3xl mx-auto space-y-6">
+      {/* Profile completeness banner */}
+      {incomplete && (
+        <div className="bg-amber-50 border border-amber-200 rounded-2xl p-4 flex items-start gap-3">
+          <div className="text-2xl">⚡</div>
+          <div className="flex-1">
+            <p className="font-semibold text-amber-800 text-sm">Complete your profile ({completeness}/4 done)</p>
+            <p className="text-amber-700 text-xs mt-0.5">Buyers trust completed profiles more. Add your
+              {!profile.avatar_url && ' photo'}
+              {!profile.avatar_url && !profile.bio && ' and'}
+              {!profile.bio && ' bio'}
+              {items.length === 0 && ' and post your first item'}
+              {' '}to get your first swap.
+            </p>
+          </div>
+        </div>
+      )}
+
       {/* Profile card */}
       <div className="bg-white rounded-2xl border border-gray-100 p-6">
         <div className="flex items-start gap-5">
