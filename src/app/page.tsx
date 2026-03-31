@@ -112,8 +112,8 @@ export default function HomePage() {
               </>
             ) : (
               <>
-                <Link href="/auth/signup" className="bg-indigo-600 text-white font-semibold px-8 py-3 rounded-xl hover:bg-indigo-700 transition-colors flex items-center justify-center gap-2">
-                  Start Swapping Free <ArrowRight size={16} />
+                <Link href="/swaps" className="bg-indigo-600 text-white font-semibold px-8 py-3 rounded-xl hover:bg-indigo-700 transition-colors flex items-center justify-center gap-2">
+                  My Swaps <ArrowRight size={16} />
                 </Link>
                 <Link href="/how-it-works" className="border border-gray-200 text-gray-700 font-semibold px-8 py-3 rounded-xl hover:bg-gray-50 transition-colors">
                   How It Works
