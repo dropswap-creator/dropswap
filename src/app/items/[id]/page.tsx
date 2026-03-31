@@ -8,7 +8,7 @@ import { createClient } from '@/lib/supabase'
 import TrustScore from '@/components/TrustScore'
 import ItemCard from '@/components/ItemCard'
 import type { Item, Profile } from '@/lib/types'
-import { MapPin, Tag, ArrowLeftRight, Trash2, ChevronLeft, ChevronRight, Flag, Pencil } from 'lucide-react'
+import { MapPin, Tag, ArrowLeftRight, Trash2, ChevronLeft, ChevronRight, Flag, Pencil, Share2 } from 'lucide-react'
 
 export default function ItemPage() {
   const { id } = useParams<{ id: string }>()
@@ -25,6 +25,7 @@ export default function ItemPage() {
   const [alreadyOffered, setAlreadyOffered] = useState(false)
   const [imgIndex, setImgIndex] = useState(0)
   const [loading, setLoading] = useState(true)
+  const [shared, setShared] = useState(false)
   const [reported, setReported] = useState(false)
   const [reporting, setReporting] = useState(false)
   const [reportReason, setReportReason] = useState('')
@@ -171,11 +172,21 @@ export default function ItemPage() {
         <div className="space-y-4">
           <div>
             <h1 className="text-2xl font-bold text-gray-900">{item.title}</h1>
-            <div className="flex items-center gap-3 mt-2">
+            <div className="flex items-center gap-2 mt-2 flex-wrap">
               <span className="flex items-center gap-1 text-sm text-indigo-600 bg-indigo-50 px-2 py-1 rounded-full">
                 <Tag size={12} />
                 {item.category}
               </span>
+              {item.condition && (
+                <span className={`text-sm px-2 py-1 rounded-full font-medium ${
+                  item.condition === 'New' ? 'bg-green-50 text-green-700' :
+                  item.condition === 'Good' ? 'bg-blue-50 text-blue-700' :
+                  item.condition === 'Fair' ? 'bg-yellow-50 text-yellow-700' :
+                  'bg-red-50 text-red-700'
+                }`}>
+                  {item.condition}
+                </span>
+              )}
               <span className="flex items-center gap-1 text-sm text-gray-500">
                 <MapPin size={12} />
                 {item.country}
@@ -207,6 +218,24 @@ export default function ItemPage() {
               />
             </div>
           </Link>
+
+          {/* Share */}
+          <button
+            onClick={async () => {
+              const url = window.location.href
+              if (navigator.share) {
+                await navigator.share({ title: item.title, text: `Check out this item on DropSwap: ${item.title}`, url })
+              } else {
+                await navigator.clipboard.writeText(url)
+                setShared(true)
+                setTimeout(() => setShared(false), 2000)
+              }
+            }}
+            className="flex items-center gap-2 text-sm text-gray-500 border border-gray-200 px-3 py-2 rounded-xl hover:bg-gray-50 transition-colors"
+          >
+            <Share2 size={15} />
+            {shared ? 'Link copied!' : 'Share'}
+          </button>
 
           {/* Actions */}
           {isOwner ? (

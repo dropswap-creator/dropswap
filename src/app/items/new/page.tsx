@@ -12,6 +12,7 @@ export default function NewItemPage() {
   const [description, setDescription] = useState('')
   const [category, setCategory] = useState('')
   const [customCategory, setCustomCategory] = useState('')
+  const [condition, setCondition] = useState('')
   const [estimatedValue, setEstimatedValue] = useState('')
   const [images, setImages] = useState<File[]>([])
   const [previews, setPreviews] = useState<string[]>([])
@@ -86,6 +87,7 @@ export default function NewItemPage() {
       images: uploadedUrls,
       country: userCountry,
       ...(estimatedValue ? { estimated_value: parseFloat(estimatedValue) } : {}),
+      ...(condition ? { condition } : {}),
     })
 
     if (insertError) {
@@ -165,6 +167,27 @@ export default function NewItemPage() {
             placeholder="Describe the item, its condition, and what you'd like in return..."
           />
           <p className="text-xs text-gray-400 mt-1 text-right">{description.length}/500</p>
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">Condition</label>
+          <div className="grid grid-cols-4 gap-2">
+            {(['New', 'Good', 'Fair', 'Poor'] as const).map((c) => (
+              <button
+                key={c}
+                type="button"
+                onClick={() => setCondition(c)}
+                className={`py-2 rounded-xl text-sm font-medium border transition-colors ${
+                  condition === c
+                    ? 'bg-indigo-600 text-white border-indigo-600'
+                    : 'bg-white text-gray-600 border-gray-200 hover:border-indigo-300'
+                }`}
+              >
+                {c}
+              </button>
+            ))}
+          </div>
+          {!condition && <p className="text-xs text-gray-400 mt-1">Select the condition of your item</p>}
         </div>
 
         <div>

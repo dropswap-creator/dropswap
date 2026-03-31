@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { useRouter, usePathname } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase'
-import { Plus, User, LogOut, List, Gift, Menu, X, Search } from 'lucide-react'
+import { Plus, User, LogOut, List, Gift, Menu, X, Search, Bookmark } from 'lucide-react'
 import Image from 'next/image'
 import type { User as SupaUser } from '@supabase/supabase-js'
 import NotificationBell from '@/components/NotificationBell'
@@ -52,6 +52,9 @@ export default function Navbar() {
               <Link href="/giveaways" className={`flex items-center gap-1.5 text-sm px-3 py-1.5 rounded-lg transition-colors ${pathname.startsWith('/giveaways') ? 'text-pink-600 bg-pink-50' : 'text-gray-600 hover:bg-gray-50'}`}>
                 <Gift size={16} /> Giveaways
               </Link>
+              <Link href="/wanted" className={`flex items-center gap-1.5 text-sm px-3 py-1.5 rounded-lg transition-colors ${pathname.startsWith('/wanted') ? 'text-indigo-600 bg-indigo-50' : 'text-gray-600 hover:bg-gray-50'}`}>
+                <Bookmark size={16} /> Wanted
+              </Link>
               <Link href="/swaps" className={`flex items-center gap-1.5 text-sm px-3 py-1.5 rounded-lg transition-colors ${pathname.startsWith('/swaps') ? 'text-indigo-600 bg-indigo-50' : 'text-gray-600 hover:bg-gray-50'}`}>
                 <List size={16} /> My Swaps
               </Link>
@@ -96,6 +99,9 @@ export default function Navbar() {
               </Link>
               <Link href="/giveaways" className="flex items-center gap-3 px-3 py-3 text-gray-700 rounded-xl text-sm hover:bg-gray-50">
                 <Gift size={18} /> Giveaways
+              </Link>
+              <Link href="/wanted" className="flex items-center gap-3 px-3 py-3 text-gray-700 rounded-xl text-sm hover:bg-gray-50">
+                <Bookmark size={18} /> Wanted
               </Link>
               <Link href="/swaps" className="flex items-center gap-3 px-3 py-3 text-gray-700 rounded-xl text-sm hover:bg-gray-50">
                 <List size={18} /> My Swaps

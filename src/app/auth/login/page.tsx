@@ -25,13 +25,19 @@ export default function LoginPage() {
     setLoading(true)
     setError('')
 
-    const { error } = await supabase.auth.signInWithPassword({ email, password })
+    const { error, data } = await supabase.auth.signInWithPassword({ email, password })
     if (error) {
       setError(error.message)
       setLoading(false)
     } else {
-      router.push('/')
-      router.refresh()
+      // Redirect to welcome if no username set yet
+      const { data: profile } = await supabase.from('profiles').select('username').eq('id', data.user.id).single()
+      if (!profile?.username) {
+        router.push('/welcome')
+      } else {
+        router.push('/')
+        router.refresh()
+      }
     }
   }
 

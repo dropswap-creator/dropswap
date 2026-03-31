@@ -91,6 +91,7 @@ export interface Item {
   country: string
   status: 'available' | 'in_swap' | 'swapped'
   estimated_value?: number | null
+  condition?: 'New' | 'Good' | 'Fair' | 'Poor' | null
   covers_delivery?: boolean
   created_at: string
   profiles?: Profile

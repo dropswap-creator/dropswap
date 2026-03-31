@@ -53,6 +53,16 @@ export default function ItemCard({ item }: ItemCardProps) {
               <Tag size={10} />
               {item.category}
             </span>
+            {item.condition && (
+              <span className={`text-xs px-2 py-1 rounded-full font-medium ${
+                item.condition === 'New' ? 'bg-green-50 text-green-700' :
+                item.condition === 'Good' ? 'bg-blue-50 text-blue-700' :
+                item.condition === 'Fair' ? 'bg-yellow-50 text-yellow-700' :
+                'bg-red-50 text-red-700'
+              }`}>
+                {item.condition}
+              </span>
+            )}
             {item.estimated_value && (
               <span className="text-xs text-emerald-700 bg-emerald-50 px-2 py-1 rounded-full font-medium">
                 ~£{item.estimated_value}
