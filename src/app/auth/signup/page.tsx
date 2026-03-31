@@ -15,7 +15,6 @@ export default function SignupPage() {
   const [agreedTerms, setAgreedTerms] = useState(false)
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
-  const [sent, setSent] = useState(false)
   const router = useRouter()
   const supabase = createClient()
 
@@ -33,40 +32,35 @@ export default function SignupPage() {
     setLoading(true)
     setError('')
 
-    const { data, error: signupError } = await supabase.auth.signUp({ email, password })
-    if (signupError) {
-      setError(signupError.message)
+    const res = await fetch('/api/auth/signup', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password, country }),
+    })
+    const result = await res.json()
+    if (!res.ok) {
+      setError(result.error || 'Signup failed')
       setLoading(false)
       return
     }
 
-    if (data.user) {
-      await supabase.from('profiles').upsert({ id: data.user.id, country })
-      await fetch('/api/email', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ type: 'welcome', to: email }),
-      })
+    // Sign in immediately — user is already confirmed
+    const { error: loginError } = await supabase.auth.signInWithPassword({ email, password })
+    if (loginError) {
+      setError(loginError.message)
+      setLoading(false)
+      return
     }
 
-    setSent(true)
-    setLoading(false)
-  }
+    // Send welcome email via Resend
+    await fetch('/api/email', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ type: 'welcome', to: email }),
+    })
 
-  if (sent) {
-    return (
-      <div className="min-h-[70vh] flex items-center justify-center py-8">
-        <div className="bg-white p-8 rounded-2xl shadow-sm border border-gray-100 w-full max-w-sm text-center">
-          <div className="text-5xl mb-4">📬</div>
-          <h2 className="text-xl font-bold text-gray-900 mb-2">Check your email</h2>
-          <p className="text-gray-600 text-sm mb-2">We sent a verification link to <strong>{email}</strong></p>
-          <p className="text-gray-500 text-sm">Click the link in the email to activate your account. Check your spam folder if you don't see it.</p>
-          <Link href="/auth/login" className="mt-6 inline-block text-indigo-600 font-medium hover:underline text-sm">
-            Back to login
-          </Link>
-        </div>
-      </div>
-    )
+    router.push('/')
+    router.refresh()
   }
 
   return (
