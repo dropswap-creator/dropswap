@@ -59,8 +59,8 @@ export default function NewGiveawayPage() {
     for (const file of images) {
       const ext = file.name.split('.').pop()
       const path = `items/${userId}/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`
-      const { error: uploadError } = await supabase.storage.from('images').upload(path, file)
-      if (uploadError) { setError('Image upload failed'); setLoading(false); return }
+      const { error: uploadError } = await supabase.storage.from('images').upload(path, file, { upsert: true })
+      if (uploadError) { setError('Image upload failed: ' + uploadError.message); setLoading(false); return }
       const { data: { publicUrl } } = supabase.storage.from('images').getPublicUrl(path)
       uploadedUrls.push(publicUrl)
     }
@@ -127,8 +127,9 @@ export default function NewGiveawayPage() {
             placeholder="Describe the item and collection/postage details..." />
         </div>
 
-        <div className="bg-pink-50 border border-pink-100 rounded-xl p-4 text-sm text-pink-800">
-          <strong>Note:</strong> Giveaways are free to post. The person who claims your item pays a £0.99 admin fee to DropSwap. By default, the receiver covers delivery costs.
+        <div className="bg-pink-50 border border-pink-100 rounded-xl p-4 text-sm text-pink-800 space-y-1">
+          <p><strong>Note:</strong> Giveaways are free to post. The person who claims your item pays a £0.99 admin fee to DropSwap.</p>
+          <p>The receiver is <strong>obliged to pay for delivery</strong> unless you tick the box below to cover it yourself.</p>
         </div>
 
         <label className="flex items-start gap-3 cursor-pointer">
