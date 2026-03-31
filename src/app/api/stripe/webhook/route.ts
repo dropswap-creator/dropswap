@@ -28,10 +28,9 @@ export async function POST(req: NextRequest) {
     const { type, swapId, userId, itemId } = session.metadata || {}
 
     if (type === 'swap_fee' && swapId && userId) {
-      // Check if receiver is paying — if so, auto-accept the swap
       const { data: swap } = await supabase
         .from('swaps')
-        .select('status, receiver_id, requester_id')
+        .select('status, receiver_id, requester_id, requester_paid')
         .eq('id', swapId)
         .single()
 
@@ -42,9 +41,13 @@ export async function POST(req: NextRequest) {
             .from('swaps')
             .update({ status: 'accepted', updated_at: new Date().toISOString() })
             .eq('id', swapId)
+        } else if (swap.requester_id === userId) {
+          // Requester paid — mark requester_paid = true
+          await supabase
+            .from('swaps')
+            .update({ requester_paid: true, updated_at: new Date().toISOString() })
+            .eq('id', swapId)
         }
-        // Requester paid — swap stays pending until receiver also pays
-        // (already handled by the UI showing pending state)
       }
     }
 

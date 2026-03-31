@@ -196,8 +196,10 @@ export default function SwapDetailPage() {
   const currentStep = getStepIndex(swap.status)
   const isActive = !['completed', 'declined', 'cancelled', 'disputed'].includes(swap.status)
 
+  const requesterPaid = (swap as any).requester_paid === true
+
   // Determine which action buttons to show
-  const canAccept = isReceiver && swap.status === 'pending'
+  const canAccept = false // acceptance happens via payment
   const canDecline = isReceiver && swap.status === 'pending'
   const canMarkShipped = isActive && ['accepted', 'a_shipped', 'b_shipped'].includes(swap.status) && (
     (isRequester && !['a_shipped', 'both_shipped'].includes(swap.status)) ||
@@ -327,7 +329,7 @@ export default function SwapDetailPage() {
       )}
 
       {/* Requester fee — pay £0.99 to send offer */}
-      {swap.status === 'pending' && isRequester && !paidFee && userId && (
+      {swap.status === 'pending' && isRequester && !requesterPaid && userId && (
         <div className="bg-indigo-50 border border-indigo-200 rounded-2xl p-5">
           <h2 className="font-semibold text-gray-900 mb-1">Pay £0.99 to send your offer</h2>
           <p className="text-sm text-gray-600 mb-4">
@@ -339,6 +341,12 @@ export default function SwapDetailPage() {
             userId={userId}
             label="Pay £0.99 & Send Offer"
           />
+        </div>
+      )}
+
+      {swap.status === 'pending' && isRequester && requesterPaid && (
+        <div className="bg-green-50 border border-green-200 rounded-2xl p-4 text-sm text-green-700">
+          ✅ You&apos;ve paid your £0.99 fee. Waiting for the receiver to accept.
         </div>
       )}
 
