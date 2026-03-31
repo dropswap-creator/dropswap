@@ -40,6 +40,7 @@ export default function HomePage() {
   const [category, setCategory] = useState<Category | ''>('')
   const [userCountry, setUserCountry] = useState<string | null>(null)
   const [isLoggedIn, setIsLoggedIn] = useState(false)
+  const [authLoaded, setAuthLoaded] = useState(false)
   const supabase = createClient()
 
   useEffect(() => {
@@ -56,6 +57,7 @@ export default function HomePage() {
       } else {
         setLoading(false)
       }
+      setAuthLoaded(true)
     }
     init()
   }, [])
@@ -95,8 +97,8 @@ export default function HomePage() {
             <Image src="/logo-full.png" alt="DropSwap" width={600} height={300} className="object-contain w-full max-w-lg" />
           </div>
           <p className="text-gray-500 text-base mb-8">One person&apos;s junk is another&apos;s treasure.</p>
-          <div className="flex flex-col sm:flex-row gap-3 justify-center">
-            {isLoggedIn ? (
+          <div className="flex flex-col sm:flex-row gap-3 justify-center min-h-[48px]">
+            {!authLoaded ? null : isLoggedIn ? (
               <>
                 <Link href="/items/new" className="bg-indigo-600 text-white font-semibold px-8 py-3 rounded-xl hover:bg-indigo-700 transition-colors flex items-center justify-center gap-2">
                   Post an Item <ArrowRight size={16} />
