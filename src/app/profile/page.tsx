@@ -20,6 +20,7 @@ export default function MyProfilePage() {
   const [saving, setSaving] = useState(false)
   const [saved, setSaved] = useState(false)
   const [loading, setLoading] = useState(true)
+  const [uploadingAvatar, setUploadingAvatar] = useState(false)
   const fileRef = useRef<HTMLInputElement>(null)
   const router = useRouter()
   const supabase = createClient()
@@ -74,12 +75,16 @@ export default function MyProfilePage() {
 
   async function uploadAvatar(file: File) {
     if (!userId) return
+    setUploadingAvatar(true)
     const ext = file.name.split('.').pop()
     const path = `avatars/${userId}.${ext}`
-    await supabase.storage.from('images').upload(path, file, { upsert: true })
-    const { data: { publicUrl } } = supabase.storage.from('images').getPublicUrl(path)
-    await supabase.from('profiles').update({ avatar_url: publicUrl }).eq('id', userId)
-    setProfile((p) => p ? { ...p, avatar_url: publicUrl } : p)
+    const { error } = await supabase.storage.from('images').upload(path, file, { upsert: true })
+    if (!error) {
+      const { data: { publicUrl } } = supabase.storage.from('images').getPublicUrl(path)
+      await supabase.from('profiles').update({ avatar_url: publicUrl }).eq('id', userId)
+      setProfile((p) => p ? { ...p, avatar_url: publicUrl } : p)
+    }
+    setUploadingAvatar(false)
   }
 
   if (loading) return <div className="animate-pulse bg-white rounded-2xl h-64" />
@@ -120,9 +125,10 @@ export default function MyProfilePage() {
             </div>
             <button
               onClick={() => fileRef.current?.click()}
-              className="absolute -bottom-1 -right-1 bg-white border border-gray-200 rounded-full p-1.5 hover:bg-gray-50 transition-colors"
+              disabled={uploadingAvatar}
+              className="absolute -bottom-1 -right-1 bg-white border border-gray-200 rounded-full p-1.5 hover:bg-gray-50 transition-colors disabled:opacity-50"
             >
-              <Camera size={14} className="text-gray-600" />
+              <Camera size={14} className={uploadingAvatar ? 'text-indigo-400 animate-pulse' : 'text-gray-600'} />
             </button>
             <input
               ref={fileRef}
@@ -178,8 +184,8 @@ export default function MyProfilePage() {
               </div>
               <button
                 onClick={saveProfile}
-                disabled={saving}
-                className="flex items-center gap-2 bg-indigo-600 text-white px-4 py-2 rounded-xl text-sm font-medium hover:bg-indigo-700 transition-colors disabled:opacity-50"
+                disabled={saving || saved}
+                className="flex items-center gap-2 bg-indigo-600 text-white px-4 py-2 rounded-xl text-sm font-medium hover:bg-indigo-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <Save size={15} />
                 {saved ? 'Saved!' : saving ? 'Saving...' : 'Save changes'}

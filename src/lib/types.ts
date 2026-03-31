@@ -77,6 +77,7 @@ export interface Profile {
   trust_score: number
   total_ratings: number
   completed_swaps: number
+  banned?: boolean
   created_at: string
 }
 
@@ -90,6 +91,7 @@ export interface Item {
   country: string
   status: 'available' | 'in_swap' | 'swapped'
   estimated_value?: number | null
+  covers_delivery?: boolean
   created_at: string
   profiles?: Profile
 }
@@ -101,6 +103,7 @@ export interface Swap {
   requester_item_id: string
   receiver_item_id: string
   status: SwapStatus
+  requester_paid?: boolean
   created_at: string
   updated_at: string
   requester?: Profile

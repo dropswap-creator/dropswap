@@ -27,6 +27,8 @@ export default function ItemPage() {
   const [loading, setLoading] = useState(true)
   const [reported, setReported] = useState(false)
   const [reporting, setReporting] = useState(false)
+  const [reportReason, setReportReason] = useState('')
+  const [showReportBox, setShowReportBox] = useState(false)
 
   useEffect(() => {
     async function load() {
@@ -98,17 +100,17 @@ export default function ItemPage() {
   }
 
   async function reportItem() {
-    if (!currentUser || !item) return
-    const reason = prompt('Why are you reporting this item? (e.g. spam, offensive, fake)')
-    if (!reason?.trim()) return
+    if (!currentUser || !item || !reportReason.trim()) return
+    if (reportReason.trim().length < 5) return
     setReporting(true)
     await supabase.from('reports').insert({
       item_id: item.id,
       reporter_id: currentUser,
-      reason: reason.trim(),
+      reason: reportReason.trim().slice(0, 500),
     })
     setReported(true)
     setReporting(false)
+    setShowReportBox(false)
   }
 
   async function deleteItem() {
@@ -286,10 +288,32 @@ export default function ItemPage() {
             <div className="pt-2">
               {reported ? (
                 <p className="text-xs text-gray-400">Thanks — we&apos;ll review this item.</p>
+              ) : showReportBox ? (
+                <div className="bg-red-50 border border-red-100 rounded-xl p-3 space-y-2">
+                  <textarea
+                    value={reportReason}
+                    onChange={(e) => setReportReason(e.target.value)}
+                    rows={2}
+                    maxLength={500}
+                    placeholder="Why are you reporting this? (e.g. fake listing, prohibited item...)"
+                    className="w-full px-2 py-1.5 border border-red-200 rounded-lg text-xs focus:outline-none focus:ring-1 focus:ring-red-400 resize-none bg-white"
+                  />
+                  <div className="flex gap-2">
+                    <button
+                      onClick={reportItem}
+                      disabled={reporting || reportReason.trim().length < 5}
+                      className="text-xs bg-red-500 text-white px-3 py-1.5 rounded-lg hover:bg-red-600 transition-colors disabled:opacity-40"
+                    >
+                      {reporting ? 'Reporting...' : 'Submit'}
+                    </button>
+                    <button onClick={() => setShowReportBox(false)} className="text-xs text-gray-400 hover:text-gray-600">
+                      Cancel
+                    </button>
+                  </div>
+                </div>
               ) : (
                 <button
-                  onClick={reportItem}
-                  disabled={reporting}
+                  onClick={() => setShowReportBox(true)}
                   className="flex items-center gap-1.5 text-xs text-gray-400 hover:text-red-500 transition-colors"
                 >
                   <Flag size={13} /> Report this item

@@ -196,7 +196,7 @@ export default function SwapDetailPage() {
   const currentStep = getStepIndex(swap.status)
   const isActive = !['completed', 'declined', 'cancelled', 'disputed'].includes(swap.status)
 
-  const requesterPaid = (swap as any).requester_paid === true
+  const requesterPaid = swap.requester_paid === true
 
   // Determine which action buttons to show
   const canAccept = false // acceptance happens via payment

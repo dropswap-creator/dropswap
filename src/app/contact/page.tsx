@@ -21,20 +21,24 @@ export default function ContactPage() {
   const [email, setEmail] = useState('')
   const [sent, setSent] = useState(false)
   const [sending, setSending] = useState(false)
+  const [error, setError] = useState('')
   const supabase = createClient()
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
+    setError('')
+    if (details.trim().length < 20) { setError('Please provide at least 20 characters of detail.'); return }
+    if (details.length > 2000) { setError('Details must be under 2000 characters.'); return }
+    if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { setError('Please enter a valid email address.'); return }
+
     setSending(true)
-
-    // Store report in database
-    await supabase.from('reports').insert({
+    const { error: dbError } = await supabase.from('reports').insert({
       type,
-      details,
-      contact_email: email,
-    }).select()
-
+      details: details.trim().slice(0, 2000),
+      contact_email: email.trim() || null,
+    })
     setSending(false)
+    if (dbError) { setError('Something went wrong. Please try again.'); return }
     setSent(true)
   }
 
@@ -103,6 +107,8 @@ export default function ContactPage() {
             placeholder="you@example.com"
           />
         </div>
+
+        {error && <p className="text-red-500 text-sm bg-red-50 px-3 py-2 rounded-lg">{error}</p>}
 
         <button
           type="submit"
