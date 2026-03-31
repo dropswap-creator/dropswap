@@ -76,6 +76,22 @@ export default function ItemPage() {
     })
     if (!error) {
       await supabase.from('items').update({ status: 'in_swap' }).eq('id', selectedMyItem)
+      // Get the new swap id to send email notification
+      const { data: newSwap } = await supabase
+        .from('swaps')
+        .select('id')
+        .eq('requester_id', currentUser)
+        .eq('receiver_item_id', item.id)
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .single()
+      if (newSwap) {
+        fetch('/api/notify/swap', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ swapId: newSwap.id }),
+        })
+      }
       setOfferSent(true)
     }
     setOffering(false)

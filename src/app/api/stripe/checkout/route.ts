@@ -34,7 +34,7 @@ export async function POST(req: NextRequest) {
       mode: 'payment',
       success_url: type === 'giveaway'
         ? `${process.env.NEXT_PUBLIC_SITE_URL}/giveaways/${itemId}/claimed`
-        : `${process.env.NEXT_PUBLIC_SITE_URL}/swaps/${swapId}?payment=success`,
+        : `${process.env.NEXT_PUBLIC_SITE_URL}/payment/success?swapId=${swapId}`,
       cancel_url: type === 'giveaway'
         ? `${process.env.NEXT_PUBLIC_SITE_URL}/giveaways/${itemId}/claim`
         : `${process.env.NEXT_PUBLIC_SITE_URL}/swaps/${swapId}?payment=cancelled`,

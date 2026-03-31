@@ -50,6 +50,19 @@ export default function MyProfilePage() {
     load()
   }, [])
 
+  async function deleteAccount() {
+    if (!confirm('Are you sure you want to permanently delete your account? This cannot be undone.')) return
+    if (!confirm('Last chance — this will delete all your data immediately.')) return
+    const { data: { session } } = await supabase.auth.getSession()
+    if (!session) return
+    await fetch('/api/account/delete', {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${session.access_token}` },
+    })
+    await supabase.auth.signOut()
+    router.push('/')
+  }
+
   async function saveProfile() {
     if (!userId) return
     setSaving(true)
@@ -174,6 +187,18 @@ export default function MyProfilePage() {
             </div>
           </div>
         </div>
+      </div>
+
+      {/* Danger zone */}
+      <div className="bg-white rounded-2xl border border-red-100 p-5">
+        <h2 className="font-semibold text-gray-900 mb-1 text-sm">Danger zone</h2>
+        <p className="text-xs text-gray-500 mb-3">Permanently delete your account and all associated data. This cannot be undone.</p>
+        <button
+          onClick={deleteAccount}
+          className="text-sm text-red-500 border border-red-200 px-4 py-2 rounded-xl hover:bg-red-50 transition-colors"
+        >
+          Delete my account
+        </button>
       </div>
 
       {/* My items */}
