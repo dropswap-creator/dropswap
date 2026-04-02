@@ -13,7 +13,9 @@ function WelcomeContent() {
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null)
   const [uploading, setUploading] = useState(false)
   const [saving, setSaving] = useState(false)
+  const [error, setError] = useState('')
   const [username, setUsername] = useState('')
+  const [loaded, setLoaded] = useState(false)
   const fileRef = useRef<HTMLInputElement>(null)
   const router = useRouter()
   const searchParams = useSearchParams()
@@ -29,6 +31,7 @@ function WelcomeContent() {
         if (data?.avatar_url) setAvatarUrl(data.avatar_url)
         if (data?.bio) setBio(data.bio)
         if (data?.country) setCountry(data.country)
+        setLoaded(true)
       })
     })
   }, [])
@@ -45,15 +48,25 @@ function WelcomeContent() {
   }
 
   async function handleFinish() {
+    if (!country) { setError('Please select your country to continue.'); return }
     if (!userId) return
     setSaving(true)
+    setError('')
     await supabase.from('profiles').update({
       bio: bio || null,
       avatar_url: avatarUrl || null,
-      ...(country ? { country } : {}),
+      country,
     }).eq('id', userId)
     const next = searchParams.get('next')
     router.push(next || '/')
+  }
+
+  if (!loaded) {
+    return (
+      <div className="min-h-[80vh] flex items-center justify-center">
+        <div className="animate-pulse bg-white rounded-2xl w-full max-w-sm h-96" />
+      </div>
+    )
   }
 
   return (
@@ -61,7 +74,7 @@ function WelcomeContent() {
       <div className="bg-white rounded-2xl border border-gray-100 shadow-sm w-full max-w-sm p-8">
         <div className="text-center mb-6">
           <div className="text-4xl mb-3">👋</div>
-          <h1 className="text-2xl font-bold text-gray-900">Welcome, {username}!</h1>
+          <h1 className="text-2xl font-bold text-gray-900">Welcome{username ? `, ${username}` : ''}!</h1>
           <p className="text-gray-500 text-sm mt-1">Add a photo and bio so people know who they&apos;re swapping with.</p>
         </div>
 
@@ -107,9 +120,8 @@ function WelcomeContent() {
             Your country <span className="text-red-400">*</span>
           </label>
           <select
-            required
             value={country}
-            onChange={(e) => setCountry(e.target.value)}
+            onChange={(e) => { setCountry(e.target.value); setError('') }}
             className="w-full px-3 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white text-gray-900"
           >
             <option value="">Select your country...</option>
@@ -118,14 +130,15 @@ function WelcomeContent() {
           <p className="text-xs text-gray-400 mt-1">Used to show you local listings — you can change this in your profile.</p>
         </div>
 
+        {error && <p className="text-red-500 text-sm bg-red-50 px-3 py-2 rounded-lg mb-4">{error}</p>}
+
         <button
           onClick={handleFinish}
-          disabled={saving}
+          disabled={saving || uploading}
           className="w-full bg-indigo-600 text-white py-2.5 rounded-xl font-medium hover:bg-indigo-700 transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
         >
           {saving ? 'Saving...' : <>Start Swapping <ArrowRight size={16} /></>}
         </button>
-
       </div>
     </div>
   )
