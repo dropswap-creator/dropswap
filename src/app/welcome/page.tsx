@@ -1,13 +1,13 @@
 'use client'
 
-import { useState, useRef, useEffect } from 'react'
+import { useState, useRef, useEffect, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { createClient } from '@/lib/supabase'
 import { COUNTRIES } from '@/lib/types'
 import Image from 'next/image'
 import { Camera, ArrowRight } from 'lucide-react'
 
-export default function WelcomePage() {
+function WelcomeContent() {
   const [bio, setBio] = useState('')
   const [country, setCountry] = useState('')
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null)
@@ -135,5 +135,13 @@ export default function WelcomePage() {
         </button>
       </div>
     </div>
+  )
+}
+
+export default function WelcomePage() {
+  return (
+    <Suspense fallback={<div className="min-h-[80vh] flex items-center justify-center"><div className="animate-pulse bg-white rounded-2xl w-full max-w-sm h-96" /></div>}>
+      <WelcomeContent />
+    </Suspense>
   )
 }
