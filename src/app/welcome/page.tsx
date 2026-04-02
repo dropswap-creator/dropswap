@@ -47,12 +47,11 @@ function WelcomeContent() {
   async function handleFinish() {
     if (!userId) return
     setSaving(true)
-    await supabase.from('profiles').upsert({
-      id: userId,
+    await supabase.from('profiles').update({
       bio: bio || null,
       avatar_url: avatarUrl || null,
-      country: country || null,
-    })
+      ...(country ? { country } : {}),
+    }).eq('id', userId)
     const next = searchParams.get('next')
     router.push(next || '/')
   }
