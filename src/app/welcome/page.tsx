@@ -126,12 +126,6 @@ function WelcomeContent() {
           {saving ? 'Saving...' : <>Start Swapping <ArrowRight size={16} /></>}
         </button>
 
-        <button
-          onClick={() => router.push('/')}
-          className="w-full text-center text-sm text-gray-400 hover:text-gray-600 mt-3"
-        >
-          Skip for now
-        </button>
       </div>
     </div>
   )

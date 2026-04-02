@@ -1,7 +1,21 @@
+'use client'
+
+import { useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 import Link from 'next/link'
+import { createClient } from '@/lib/supabase'
 import { Gift } from 'lucide-react'
 
 export default function ClaimedPage() {
+  const router = useRouter()
+  const supabase = createClient()
+
+  useEffect(() => {
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      if (!user) router.replace('/auth/login')
+    })
+  }, [])
+
   return (
     <div className="min-h-[60vh] flex items-center justify-center">
       <div className="bg-white rounded-2xl border border-gray-100 p-10 text-center max-w-sm shadow-sm">

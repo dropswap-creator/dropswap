@@ -31,7 +31,13 @@ export default function LoginPage() {
       setLoading(false)
     } else {
       // Redirect to welcome if no username set yet
-      const { data: profile } = await supabase.from('profiles').select('username, country').eq('id', data.user.id).single()
+      const { data: profile } = await supabase.from('profiles').select('username, country, banned').eq('id', data.user.id).single()
+      if ((profile as any)?.banned) {
+        await supabase.auth.signOut()
+        setError('Your account has been suspended. Please contact support.')
+        setLoading(false)
+        return
+      }
       if (!profile?.username || !profile?.country) {
         router.push('/welcome')
       } else {
