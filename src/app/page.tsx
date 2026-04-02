@@ -45,7 +45,8 @@ export default function HomePage() {
 
   useEffect(() => {
     async function init() {
-      const { data: { user } } = await supabase.auth.getUser()
+      const { data: { session } } = await supabase.auth.getSession()
+      const user = session?.user
       if (user) {
         setIsLoggedIn(true)
         const { data: profile } = await supabase
@@ -72,6 +73,7 @@ export default function HomePage() {
       .from('items')
       .select('*, profiles(id, username, trust_score, total_ratings, completed_swaps)')
       .eq('status', 'available')
+      .not('title', 'ilike', '[GIVEAWAY]%')
       .order('created_at', { ascending: false })
 
     if (userCountry) query = query.eq('country', userCountry)
@@ -112,8 +114,8 @@ export default function HomePage() {
               </>
             ) : (
               <>
-                <Link href="/swaps" className="bg-indigo-600 text-white font-semibold px-8 py-3 rounded-xl hover:bg-indigo-700 transition-colors flex items-center justify-center gap-2">
-                  My Swaps <ArrowRight size={16} />
+                <Link href="/auth/signup" className="bg-indigo-600 text-white font-semibold px-8 py-3 rounded-xl hover:bg-indigo-700 transition-colors flex items-center justify-center gap-2">
+                  Start Swapping Free <ArrowRight size={16} />
                 </Link>
                 <Link href="/how-it-works" className="border border-gray-200 text-gray-700 font-semibold px-8 py-3 rounded-xl hover:bg-gray-50 transition-colors">
                   How It Works

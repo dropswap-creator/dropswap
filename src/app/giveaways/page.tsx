@@ -93,7 +93,7 @@ export default function GiveawaysPage() {
                 </div>
               </div>
               <div className="p-4">
-                <h3 className="font-semibold text-gray-900 truncate mb-1">{item.title}</h3>
+                <h3 className="font-semibold text-gray-900 truncate mb-1">{item.title.replace(/^\[GIVEAWAY\]\s*/i, '')}</h3>
                 <p className="text-gray-500 text-sm line-clamp-2 mb-3">{item.description}</p>
                 <div className="flex items-center gap-2 mb-3">
                   <span className="flex items-center gap-1 text-xs text-gray-500">

@@ -27,7 +27,9 @@ export default function ClaimGiveawayPage() {
         .eq('id', id)
         .single()
 
-      if (data) setItem(data as Item)
+      if (!data) { setLoading(false); return }
+      if (data.user_id === user.id) { router.push('/giveaways'); return }
+      setItem(data as Item)
       setLoading(false)
     }
     load()
@@ -71,7 +73,7 @@ export default function ClaimGiveawayPage() {
         )}
 
         <div className="p-6">
-          <h1 className="text-xl font-bold text-gray-900 mb-2">{item.title}</h1>
+          <h1 className="text-xl font-bold text-gray-900 mb-2">{item.title.replace(/^\[GIVEAWAY\]\s*/i, '')}</h1>
           <p className="text-gray-500 text-sm mb-4">{item.description}</p>
           <div className="flex items-center gap-1 text-xs text-gray-400 mb-6">
             <MapPin size={12} /> {item.country}

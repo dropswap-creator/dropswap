@@ -30,17 +30,21 @@ export async function POST(req: NextRequest) {
     if (type === 'swap_fee' && swapId && userId) {
       const { data: swap } = await supabase
         .from('swaps')
-        .select('status, receiver_id, requester_id, requester_paid')
+        .select('status, receiver_id, requester_id, requester_paid, receiver_item_id')
         .eq('id', swapId)
         .single()
 
       if (swap) {
         if (swap.status === 'pending' && swap.receiver_id === userId) {
-          // Receiver paid — accept the swap
+          // Receiver paid — accept the swap and lock their item
           await supabase
             .from('swaps')
             .update({ status: 'accepted', updated_at: new Date().toISOString() })
             .eq('id', swapId)
+          await supabase
+            .from('items')
+            .update({ status: 'in_swap' })
+            .eq('id', swap.receiver_item_id)
         } else if (swap.requester_id === userId) {
           // Requester paid — mark requester_paid = true
           await supabase

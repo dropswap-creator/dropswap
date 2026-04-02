@@ -31,8 +31,8 @@ export default function LoginPage() {
       setLoading(false)
     } else {
       // Redirect to welcome if no username set yet
-      const { data: profile } = await supabase.from('profiles').select('username').eq('id', data.user.id).single()
-      if (!profile?.username) {
+      const { data: profile } = await supabase.from('profiles').select('username, country').eq('id', data.user.id).single()
+      if (!profile?.username || !profile?.country) {
         router.push('/welcome')
       } else {
         router.push('/')

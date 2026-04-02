@@ -30,6 +30,7 @@ function SearchContent() {
       .from('items')
       .select('*, profiles(id, username, trust_score, total_ratings, completed_swaps)')
       .eq('status', 'available')
+      .not('title', 'ilike', '[GIVEAWAY]%')
 
     if (category) q = q.eq('category', category)
     if (country) q = q.eq('country', country)

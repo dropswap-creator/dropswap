@@ -1,19 +1,22 @@
 'use client'
 
 import { useState, useRef, useEffect } from 'react'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { createClient } from '@/lib/supabase'
+import { COUNTRIES } from '@/lib/types'
 import Image from 'next/image'
 import { Camera, ArrowRight } from 'lucide-react'
 
 export default function WelcomePage() {
   const [bio, setBio] = useState('')
+  const [country, setCountry] = useState('')
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null)
   const [uploading, setUploading] = useState(false)
   const [saving, setSaving] = useState(false)
   const [username, setUsername] = useState('')
   const fileRef = useRef<HTMLInputElement>(null)
   const router = useRouter()
+  const searchParams = useSearchParams()
   const supabase = createClient()
   const [userId, setUserId] = useState<string | null>(null)
 
@@ -21,10 +24,11 @@ export default function WelcomePage() {
     supabase.auth.getUser().then(({ data: { user } }) => {
       if (!user) { router.replace('/auth/login'); return }
       setUserId(user.id)
-      supabase.from('profiles').select('username, avatar_url, bio').eq('id', user.id).single().then(({ data }) => {
+      supabase.from('profiles').select('username, avatar_url, bio, country').eq('id', user.id).single().then(({ data }) => {
         if (data?.username) setUsername(data.username)
         if (data?.avatar_url) setAvatarUrl(data.avatar_url)
         if (data?.bio) setBio(data.bio)
+        if (data?.country) setCountry(data.country)
       })
     })
   }, [])
@@ -43,11 +47,14 @@ export default function WelcomePage() {
   async function handleFinish() {
     if (!userId) return
     setSaving(true)
-    await supabase.from('profiles').update({
+    await supabase.from('profiles').upsert({
+      id: userId,
       bio: bio || null,
       avatar_url: avatarUrl || null,
-    }).eq('id', userId)
-    router.push('/')
+      country: country || null,
+    })
+    const next = searchParams.get('next')
+    router.push(next || '/')
   }
 
   return (
@@ -83,7 +90,7 @@ export default function WelcomePage() {
         </div>
 
         {/* Bio */}
-        <div className="mb-6">
+        <div className="mb-4">
           <label className="block text-sm font-medium text-gray-700 mb-1">Bio <span className="text-gray-400 font-normal">(optional)</span></label>
           <textarea
             value={bio}
@@ -93,6 +100,23 @@ export default function WelcomePage() {
             placeholder="e.g. Based in London, love vintage clothes and books..."
             className="w-full px-3 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-none"
           />
+        </div>
+
+        {/* Country */}
+        <div className="mb-6">
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Your country <span className="text-red-400">*</span>
+          </label>
+          <select
+            required
+            value={country}
+            onChange={(e) => setCountry(e.target.value)}
+            className="w-full px-3 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white text-gray-900"
+          >
+            <option value="">Select your country...</option>
+            {COUNTRIES.map((c) => <option key={c} value={c}>{c}</option>)}
+          </select>
+          <p className="text-xs text-gray-400 mt-1">Used to show you local listings — you can change this in your profile.</p>
         </div>
 
         <button

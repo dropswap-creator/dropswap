@@ -279,7 +279,7 @@ export default function SwapDetailPage() {
       </div>
 
       {/* Action Buttons */}
-      {(canAccept || canMarkShipped || canMarkReceived || canDispute) && (
+      {(canAccept || canDecline || canMarkShipped || canMarkReceived || canDispute) && (
         <div className="flex flex-wrap gap-2">
           {canAccept && (
             <button

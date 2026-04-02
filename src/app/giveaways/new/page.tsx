@@ -30,7 +30,11 @@ export default function NewGiveawayPage() {
         .select('country')
         .eq('id', user.id)
         .single()
-      if (profile) setUserCountry(profile.country)
+      if (!profile) {
+        router.push('/welcome?next=/giveaways/new')
+        return
+      }
+      setUserCountry(profile.country)
     }
     getUser()
   }, [])
@@ -59,7 +63,7 @@ export default function NewGiveawayPage() {
     for (const file of images) {
       const ext = file.name.split('.').pop()
       const path = `items/${userId}/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`
-      const { error: uploadError } = await supabase.storage.from('images').upload(path, file, { upsert: true })
+      const { error: uploadError } = await supabase.storage.from('images').upload(path, file)
       if (uploadError) { setError('Image upload failed: ' + uploadError.message); setLoading(false); return }
       const { data: { publicUrl } } = supabase.storage.from('images').getPublicUrl(path)
       uploadedUrls.push(publicUrl)

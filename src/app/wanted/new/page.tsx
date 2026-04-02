@@ -23,7 +23,11 @@ export default function NewWantedPage() {
       if (!user) { router.push('/auth/login'); return }
       setUserId(user.id)
       const { data: profile } = await supabase.from('profiles').select('country').eq('id', user.id).single()
-      if (profile) setUserCountry(profile.country)
+      if (!profile) {
+        router.push('/welcome?next=/wanted/new')
+        return
+      }
+      setUserCountry(profile.country)
     }
     getUser()
   }, [])

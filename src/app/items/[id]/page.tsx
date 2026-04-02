@@ -49,7 +49,6 @@ export default function ItemPage() {
           .select('*')
           .eq('user_id', user.id)
           .eq('status', 'available')
-          .eq('country', itemData.country)
 
         setMyItems((myItemsData as Item[]) || [])
 
@@ -195,6 +194,12 @@ export default function ItemPage() {
           </div>
 
           <p className="text-gray-600 leading-relaxed">{item.description}</p>
+
+          {item.covers_delivery && (
+            <div className="flex items-center gap-2 text-sm text-green-700 bg-green-50 border border-green-100 px-3 py-2 rounded-xl">
+              <span>✅</span> Seller covers delivery
+            </div>
+          )}
 
           {/* Owner */}
           <Link

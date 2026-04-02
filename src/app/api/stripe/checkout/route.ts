@@ -40,8 +40,9 @@ export async function POST(req: NextRequest) {
         : `${process.env.NEXT_PUBLIC_SITE_URL}/swaps/${swapId}?payment=cancelled`,
       metadata: {
         type,
-        swapId,
-        userId,
+        ...(swapId ? { swapId } : {}),
+        ...(userId ? { userId } : {}),
+        ...(itemId ? { itemId } : {}),
       },
     })
 
