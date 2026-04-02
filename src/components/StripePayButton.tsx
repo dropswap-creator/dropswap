@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { CreditCard } from 'lucide-react'
 
 interface StripePayButtonProps {
-  type: 'giveaway' | 'completion' | 'bond'
+  type: 'giveaway' | 'completion' | 'bond' | 'swap_fee'
   swapId: string
   userId: string
   itemValue?: number // only needed for bond
