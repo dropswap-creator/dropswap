@@ -91,7 +91,7 @@ export default function NewGiveawayPage() {
         </div>
         <div>
           <h1 className="text-xl font-bold text-gray-900">Post a Giveaway</h1>
-          <p className="text-sm text-gray-500">Give something away free — receiver pays £0.99 admin fee</p>
+          <p className="text-sm text-gray-500">Give something away free — you pay nothing, receiver pays £0.99</p>
         </div>
       </div>
 
@@ -132,7 +132,7 @@ export default function NewGiveawayPage() {
         </div>
 
         <div className="bg-pink-50 border border-pink-100 rounded-xl p-4 text-sm text-pink-800 space-y-1">
-          <p><strong>Note:</strong> Giveaways are free to post. The person who claims your item pays a £0.99 admin fee to DropSwap.</p>
+          <p><strong>Free for you to post.</strong> The person who claims your item pays the £0.99 fee — you pay nothing.</p>
           <p>The receiver is <strong>obliged to pay for delivery</strong> unless you tick the box below to cover it yourself.</p>
         </div>
 

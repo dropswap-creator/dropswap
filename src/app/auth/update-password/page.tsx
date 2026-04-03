@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase'
-import { ArrowLeftRight } from 'lucide-react'
+import Image from 'next/image'
 
 export default function UpdatePasswordPage() {
   const [password, setPassword] = useState('')
@@ -51,8 +51,8 @@ export default function UpdatePasswordPage() {
   return (
     <div className="min-h-[70vh] flex items-center justify-center py-8">
       <div className="bg-white p-8 rounded-2xl shadow-sm border border-gray-100 w-full max-w-sm">
-        <div className="flex items-center gap-2 justify-center text-indigo-600 font-bold text-xl mb-6">
-          <ArrowLeftRight size={22} />
+        <div className="flex items-center gap-2 justify-center font-bold text-xl mb-6">
+          <Image src="/logo-icon.png" alt="DropSwap" width={32} height={32} className="object-contain" />
           DropSwap
         </div>
         <h1 className="text-2xl font-bold text-gray-900 text-center mb-2">Set new password</h1>

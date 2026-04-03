@@ -5,7 +5,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase'
 import { COUNTRIES } from '@/lib/types'
-import { ArrowLeftRight } from 'lucide-react'
+import Image from 'next/image'
 
 export default function SignupPage() {
   const [email, setEmail] = useState('')
@@ -68,8 +68,8 @@ export default function SignupPage() {
   return (
     <div className="min-h-[70vh] flex items-center justify-center py-8">
       <div className="bg-white p-8 rounded-2xl shadow-sm border border-gray-100 w-full max-w-sm">
-        <div className="flex items-center gap-2 justify-center text-indigo-600 font-bold text-xl mb-2">
-          <ArrowLeftRight size={22} />
+        <div className="flex items-center gap-2 justify-center font-bold text-xl mb-2">
+          <Image src="/logo-icon.png" alt="DropSwap" width={32} height={32} className="object-contain" />
           DropSwap
         </div>
         <p className="text-center text-sm font-medium text-gray-700 mb-6">Back to Barter. Swap More. Spend Less. Forward Together.</p>

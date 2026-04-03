@@ -36,7 +36,7 @@ export default function GiveawaysPage() {
         </div>
         <h1 className="text-3xl font-bold mb-2">Giveaways</h1>
         <p className="text-pink-100 text-lg mb-4">
-          Free items from the community — just pay a £0.99 claim fee to cover admin costs.
+          Free items from the community — the receiver pays a small £0.99 claim fee.
         </p>
         <Link
           href="/giveaways/new"
@@ -50,7 +50,7 @@ export default function GiveawaysPage() {
       <div className="grid grid-cols-3 gap-4 mb-8">
         {[
           { step: '1', text: 'Browse free items posted by the community' },
-          { step: '2', text: 'Claim an item by paying £0.99 admin fee' },
+          { step: '2', text: 'Claim an item — receiver pays £0.99 admin fee' },
           { step: '3', text: 'Arrange collection or postage with the giver' },
         ].map((s) => (
           <div key={s.step} className="bg-white border border-gray-100 rounded-2xl p-4 text-center shadow-sm">
