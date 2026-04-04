@@ -16,6 +16,11 @@ export const viewport: Viewport = {
 }
 
 export const metadata: Metadata = {
+  icons: {
+    icon: '/logo-icon.png',
+    shortcut: '/logo-icon.png',
+    apple: '/logo-icon.png',
+  },
   title: 'DropSwap — Back to Barter. Swap More. Spend Less.',
   description: 'DropSwap is the UK peer-to-peer bartering platform. Trade what you have for what you need — no money, no middlemen. Beat the cost of living.',
   manifest: '/manifest.json',
