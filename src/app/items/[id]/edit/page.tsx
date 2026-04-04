@@ -47,19 +47,16 @@ export default function EditItemPage() {
     if (!item) return
     setSaving(true)
     setError('')
-    const { error: updateError } = await supabase.from('items').update({
-      title,
-      description,
-      category,
-      covers_delivery: coversDelivery,
-      ...(estimatedValue ? { estimated_value: parseFloat(estimatedValue) } : { estimated_value: null }),
-    }).eq('id', item.id)
+    const { data: { session } } = await supabase.auth.getSession()
+    if (!session) { setError('Session expired. Please log in again.'); setSaving(false); return }
 
-    if (updateError) {
-      setError(updateError.message)
-      setSaving(false)
-      return
-    }
+    const res = await fetch('/api/items/update', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${session.access_token}` },
+      body: JSON.stringify({ itemId: item.id, title, description, category, estimatedValue, coversDelivery }),
+    })
+    const body = await res.json()
+    if (!res.ok) { setError(body.error || 'Failed to save'); setSaving(false); return }
     router.push(`/items/${item.id}`)
   }
 

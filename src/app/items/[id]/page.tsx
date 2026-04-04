@@ -115,7 +115,13 @@ export default function ItemPage() {
 
   async function deleteItem() {
     if (!item || !confirm('Delete this item?')) return
-    await supabase.from('items').delete().eq('id', item.id)
+    const { data: { session } } = await supabase.auth.getSession()
+    if (!session) return
+    await fetch('/api/items/delete', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${session.access_token}` },
+      body: JSON.stringify({ itemId: item.id }),
+    })
     router.push('/')
   }
 

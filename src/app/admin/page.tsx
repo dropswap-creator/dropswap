@@ -86,35 +86,39 @@ export default function AdminPage() {
     setDisputes((disputeData as any[]) || [])
   }
 
+  async function adminAction(action: string, targetId: string, extra?: object) {
+    const { data: { session } } = await supabase.auth.getSession()
+    if (!session) return
+    await fetch('/api/admin/action', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${session.access_token}` },
+      body: JSON.stringify({ action, targetId, extra }),
+    })
+  }
+
   async function deleteItem(itemId: string) {
     if (!confirm('Delete this item? This cannot be undone.')) return
-    await supabase.from('items').delete().eq('id', itemId)
+    await adminAction('delete_item', itemId)
     setItems((prev) => prev.filter((i) => i.id !== itemId))
     setReports((prev) => prev.filter((r) => r.item_id !== itemId))
     setStats((s) => ({ ...s, items: s.items - 1 }))
   }
 
   async function dismissReport(reportId: string) {
-    await supabase.from('reports').delete().eq('id', reportId)
+    await adminAction('dismiss_report', reportId)
     setReports((prev) => prev.filter((r) => r.id !== reportId))
     setStats((s) => ({ ...s, reports: s.reports - 1 }))
   }
 
   async function banUser(userId: string) {
     if (!confirm('Ban this user? They will no longer be able to log in.')) return
-    await supabase.from('profiles').update({ banned: true }).eq('id', userId)
+    await adminAction('ban_user', userId)
     setUsers((prev) => prev.map((u) => u.id === userId ? { ...u, banned: true } as any : u))
   }
 
   async function resolveDispute(swapId: string, resolution: 'completed' | 'cancelled') {
     if (!confirm(`Mark this dispute as ${resolution}?`)) return
-    await supabase.from('swaps').update({ status: resolution, updated_at: new Date().toISOString() }).eq('id', swapId)
-    if (resolution === 'cancelled') {
-      const swap = disputes.find((d) => d.id === swapId)
-      if (swap) {
-        await supabase.from('items').update({ status: 'available' }).in('id', [swap.requester_item_id, swap.receiver_item_id])
-      }
-    }
+    await adminAction('resolve_dispute', swapId, { resolution })
     setDisputes((prev) => prev.filter((d) => d.id !== swapId))
   }
 
