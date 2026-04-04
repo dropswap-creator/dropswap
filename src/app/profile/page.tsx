@@ -88,7 +88,14 @@ export default function MyProfilePage() {
     const { error } = await supabase.storage.from('images').upload(path, file, { upsert: true })
     if (!error) {
       const { data: { publicUrl } } = supabase.storage.from('images').getPublicUrl(path)
-      await supabase.from('profiles').update({ avatar_url: publicUrl }).eq('id', userId)
+      const { data: { session } } = await supabase.auth.getSession()
+      if (session) {
+        await fetch('/api/profile/setup', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${session.access_token}` },
+          body: JSON.stringify({ avatarUrl: publicUrl, country: profile?.country || '', bio: profile?.bio || null, username: profile?.username || null }),
+        })
+      }
       setProfile((p) => p ? { ...p, avatar_url: publicUrl } : p)
     }
     setUploadingAvatar(false)

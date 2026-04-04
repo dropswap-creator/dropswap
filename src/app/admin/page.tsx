@@ -30,7 +30,8 @@ export default function AdminPage() {
   const [reports, setReports] = useState<Report[]>([])
   const [users, setUsers] = useState<Profile[]>([])
   const [items, setItems] = useState<Item[]>([])
-  const [tab, setTab] = useState<'reports' | 'items' | 'users'>('reports')
+  const [disputes, setDisputes] = useState<any[]>([])
+  const [tab, setTab] = useState<'reports' | 'items' | 'users' | 'disputes'>('reports')
 
   useEffect(() => {
     async function init() {
@@ -55,6 +56,7 @@ export default function AdminPage() {
       { data: reportData },
       { data: userData },
       { data: itemData },
+      { data: disputeData },
     ] = await Promise.all([
       supabase.from('profiles').select('*', { count: 'exact', head: true }),
       supabase.from('items').select('*', { count: 'exact', head: true }),
@@ -63,6 +65,13 @@ export default function AdminPage() {
       supabase.from('reports').select('*, items(*, profiles(*)), reporter:profiles!reporter_id(*)').order('created_at', { ascending: false }).limit(50),
       supabase.from('profiles').select('*').order('created_at', { ascending: false }).limit(50),
       supabase.from('items').select('*, profiles(*)').order('created_at', { ascending: false }).limit(50),
+      supabase.from('swaps').select(`
+        *,
+        requester:profiles!swaps_requester_id_fkey(id, username),
+        receiver:profiles!swaps_receiver_id_fkey(id, username),
+        requester_item:items!swaps_requester_item_id_fkey(title),
+        receiver_item:items!swaps_receiver_item_id_fkey(title)
+      `).eq('status', 'disputed').order('updated_at', { ascending: false }),
     ])
 
     setStats({
@@ -74,6 +83,7 @@ export default function AdminPage() {
     setReports((reportData as Report[]) || [])
     setUsers((userData as Profile[]) || [])
     setItems((itemData as Item[]) || [])
+    setDisputes((disputeData as any[]) || [])
   }
 
   async function deleteItem(itemId: string) {
@@ -94,6 +104,18 @@ export default function AdminPage() {
     if (!confirm('Ban this user? They will no longer be able to log in.')) return
     await supabase.from('profiles').update({ banned: true }).eq('id', userId)
     setUsers((prev) => prev.map((u) => u.id === userId ? { ...u, banned: true } as any : u))
+  }
+
+  async function resolveDispute(swapId: string, resolution: 'completed' | 'cancelled') {
+    if (!confirm(`Mark this dispute as ${resolution}?`)) return
+    await supabase.from('swaps').update({ status: resolution, updated_at: new Date().toISOString() }).eq('id', swapId)
+    if (resolution === 'cancelled') {
+      const swap = disputes.find((d) => d.id === swapId)
+      if (swap) {
+        await supabase.from('items').update({ status: 'available' }).in('id', [swap.requester_item_id, swap.receiver_item_id])
+      }
+    }
+    setDisputes((prev) => prev.filter((d) => d.id !== swapId))
   }
 
   if (loading) return <div className="animate-pulse bg-white rounded-2xl h-64" />
@@ -126,7 +148,7 @@ export default function AdminPage() {
 
       {/* Tabs */}
       <div className="flex gap-2 border-b border-gray-200">
-        {(['reports', 'items', 'users'] as const).map((t) => (
+        {(['reports', 'disputes', 'items', 'users'] as const).map((t) => (
           <button
             key={t}
             onClick={() => setTab(t)}
@@ -137,6 +159,9 @@ export default function AdminPage() {
             {t}
             {t === 'reports' && stats.reports > 0 && (
               <span className="ml-1.5 bg-red-100 text-red-600 text-xs px-1.5 py-0.5 rounded-full">{stats.reports}</span>
+            )}
+            {t === 'disputes' && disputes.length > 0 && (
+              <span className="ml-1.5 bg-orange-100 text-orange-600 text-xs px-1.5 py-0.5 rounded-full">{disputes.length}</span>
             )}
           </button>
         ))}
@@ -182,6 +207,54 @@ export default function AdminPage() {
                 >
                   Dismiss
                 </button>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* Disputes tab */}
+      {tab === 'disputes' && (
+        <div className="space-y-3">
+          {disputes.length === 0 ? (
+            <div className="bg-white rounded-2xl border border-gray-100 p-10 text-center text-gray-400">
+              <p className="text-2xl mb-3">⚖️</p>
+              <p>No active disputes — all clear!</p>
+            </div>
+          ) : disputes.map((dispute) => (
+            <div key={dispute.id} className="bg-white rounded-2xl border border-orange-100 p-4">
+              <div className="flex items-start justify-between gap-4">
+                <div className="flex-1 min-w-0">
+                  <p className="font-medium text-gray-900 text-sm">
+                    {(dispute.requester as any)?.username} ↔ {(dispute.receiver as any)?.username}
+                  </p>
+                  <p className="text-xs text-gray-500 mt-0.5">
+                    {(dispute.requester_item as any)?.title} ↔ {(dispute.receiver_item as any)?.title}
+                  </p>
+                  <p className="text-xs text-gray-400 mt-1">
+                    Disputed {new Date(dispute.updated_at).toLocaleDateString()}
+                  </p>
+                </div>
+                <div className="flex gap-2 shrink-0">
+                  <Link
+                    href={`/swaps/${dispute.id}`}
+                    className="flex items-center gap-1 text-xs text-gray-600 bg-gray-100 px-3 py-1.5 rounded-lg hover:bg-gray-200 transition-colors"
+                  >
+                    <Eye size={13} /> View
+                  </Link>
+                  <button
+                    onClick={() => resolveDispute(dispute.id, 'completed')}
+                    className="text-xs text-white bg-green-500 px-3 py-1.5 rounded-lg hover:bg-green-600 transition-colors"
+                  >
+                    Mark Complete
+                  </button>
+                  <button
+                    onClick={() => resolveDispute(dispute.id, 'cancelled')}
+                    className="text-xs text-gray-600 bg-gray-100 px-3 py-1.5 rounded-lg hover:bg-gray-200 transition-colors"
+                  >
+                    Cancel Swap
+                  </button>
+                </div>
               </div>
             </div>
           ))}

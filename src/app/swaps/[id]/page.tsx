@@ -133,18 +133,27 @@ export default function SwapDetailPage() {
 
   async function updateSwapStatus(newStatus: SwapStatus) {
     await supabase.from('swaps').update({ status: newStatus, updated_at: new Date().toISOString() }).eq('id', id)
+    fetch('/api/notify/swap-status', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ swapId: id, newStatus }),
+    })
     await loadSwap()
   }
 
   async function handleAccept() { await updateSwapStatus('accepted') }
   async function handleDecline() {
     await updateSwapStatus('declined')
-    // Free up items
     if (swap) {
       await supabase.from('items').update({ status: 'available' }).in('id', [
         swap.requester_item_id, swap.receiver_item_id
       ])
     }
+  }
+  async function handleCancel() {
+    if (!swap || !confirm('Cancel this swap offer?')) return
+    await updateSwapStatus('cancelled')
+    await supabase.from('items').update({ status: 'available' }).eq('id', swap.requester_item_id)
   }
   async function handleDispute() { await updateSwapStatus('disputed') }
 
@@ -200,6 +209,7 @@ export default function SwapDetailPage() {
 
   // Determine which action buttons to show
   const canAccept = false // acceptance happens via payment
+  const canCancel = isRequester && swap.status === 'pending'
   const canDecline = isReceiver && swap.status === 'pending'
   const canMarkShipped = isActive && ['accepted', 'a_shipped', 'b_shipped'].includes(swap.status) && (
     (isRequester && !['a_shipped', 'both_shipped'].includes(swap.status)) ||
@@ -279,7 +289,7 @@ export default function SwapDetailPage() {
       </div>
 
       {/* Action Buttons */}
-      {(canAccept || canDecline || canMarkShipped || canMarkReceived || canDispute) && (
+      {(canAccept || canCancel || canDecline || canMarkShipped || canMarkReceived || canDispute) && (
         <div className="flex flex-wrap gap-2">
           {canAccept && (
             <button
@@ -288,6 +298,14 @@ export default function SwapDetailPage() {
             >
               <CheckCircle size={16} />
               Accept offer
+            </button>
+          )}
+          {canCancel && (
+            <button
+              onClick={handleCancel}
+              className="flex items-center gap-2 bg-gray-100 text-gray-700 px-4 py-2.5 rounded-xl text-sm font-medium hover:bg-gray-200 transition-colors"
+            >
+              Cancel offer
             </button>
           )}
           {canDecline && (

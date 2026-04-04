@@ -8,6 +8,8 @@ import { CATEGORIES, COUNTRIES } from '@/lib/types'
 import type { Item, Category } from '@/lib/types'
 import { Search, SlidersHorizontal } from 'lucide-react'
 
+const PAGE_SIZE = 12
+
 function SearchContent() {
   const searchParams = useSearchParams()
   const router = useRouter()
@@ -15,38 +17,45 @@ function SearchContent() {
 
   const [items, setItems] = useState<Item[]>([])
   const [loading, setLoading] = useState(false)
+  const [loadingMore, setLoadingMore] = useState(false)
+  const [hasMore, setHasMore] = useState(true)
+  const [offset, setOffset] = useState(0)
   const [query, setQuery] = useState(searchParams.get('q') || '')
   const [category, setCategory] = useState<Category | ''>(searchParams.get('cat') as Category || '')
   const [country, setCountry] = useState(searchParams.get('country') || '')
   const [sortBy, setSortBy] = useState(searchParams.get('sort') || 'newest')
 
   useEffect(() => {
-    fetchItems()
+    setItems([])
+    setOffset(0)
+    setHasMore(true)
+    fetchItems(0)
   }, [category, country, sortBy])
 
-  async function fetchItems() {
-    setLoading(true)
+  async function fetchItems(from: number) {
+    if (from === 0) setLoading(true); else setLoadingMore(true)
     let q = supabase
       .from('items')
       .select('*, profiles(id, username, trust_score, total_ratings, completed_swaps)')
       .eq('status', 'available')
       .not('title', 'ilike', '[GIVEAWAY]%')
+      .range(from, from + PAGE_SIZE - 1)
 
+    if (query) q = q.or(`title.ilike.%${query}%,description.ilike.%${query}%`)
     if (category) q = q.eq('category', category)
     if (country) q = q.eq('country', country)
     if (sortBy === 'newest') q = q.order('created_at', { ascending: false })
     if (sortBy === 'oldest') q = q.order('created_at', { ascending: true })
 
     const { data } = await q
-    setItems((data as Item[]) || [])
-    setLoading(false)
+    const results = (data as Item[]) || []
+    setItems((prev) => from === 0 ? results : [...prev, ...results])
+    setHasMore(results.length === PAGE_SIZE)
+    setOffset(from + results.length)
+    if (from === 0) setLoading(false); else setLoadingMore(false)
   }
 
-  const filtered = items.filter((i) =>
-    !query ||
-    i.title.toLowerCase().includes(query.toLowerCase()) ||
-    i.description.toLowerCase().includes(query.toLowerCase())
-  )
+  const filtered = items
 
   function handleSearch(e: React.FormEvent) {
     e.preventDefault()
@@ -56,7 +65,10 @@ function SearchContent() {
     if (country) params.set('country', country)
     if (sortBy) params.set('sort', sortBy)
     router.push(`/search?${params.toString()}`)
-    fetchItems()
+    setItems([])
+    setOffset(0)
+    setHasMore(true)
+    fetchItems(0)
   }
 
   return (
@@ -137,11 +149,24 @@ function SearchContent() {
           <p className="text-sm mt-1">Try different keywords or filters</p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
-          {filtered.map((item) => (
-            <ItemCard key={item.id} item={item} />
-          ))}
-        </div>
+        <>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+            {filtered.map((item) => (
+              <ItemCard key={item.id} item={item} />
+            ))}
+          </div>
+          {hasMore && (
+            <div className="text-center mt-8">
+              <button
+                onClick={() => fetchItems(offset)}
+                disabled={loadingMore}
+                className="border border-gray-200 text-gray-700 font-medium px-8 py-2.5 rounded-xl hover:bg-gray-50 transition-colors text-sm disabled:opacity-50"
+              >
+                {loadingMore ? 'Loading...' : 'Load more'}
+              </button>
+            </div>
+          )}
+        </>
       )}
     </div>
   )

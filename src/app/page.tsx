@@ -34,8 +34,12 @@ const CATEGORY_ICONS: Record<string, string> = {
 }
 
 export default function HomePage() {
+  const PAGE_SIZE = 12
   const [items, setItems] = useState<Item[]>([])
   const [loading, setLoading] = useState(true)
+  const [loadingMore, setLoadingMore] = useState(false)
+  const [hasMore, setHasMore] = useState(true)
+  const [offset, setOffset] = useState(0)
   const [search, setSearch] = useState('')
   const [category, setCategory] = useState<Category | ''>('')
   const [userCountry, setUserCountry] = useState<string | null>(null)
@@ -55,8 +59,6 @@ export default function HomePage() {
           .eq('id', user.id)
           .single()
         if (profile?.country) setUserCountry(profile.country)
-      } else {
-        setLoading(false)
       }
       setAuthLoaded(true)
     }
@@ -64,28 +66,37 @@ export default function HomePage() {
   }, [])
 
   useEffect(() => {
-    if (isLoggedIn) fetchItems()
-  }, [category, userCountry, isLoggedIn])
+    if (!authLoaded) return
+    setItems([])
+    setOffset(0)
+    setHasMore(true)
+    fetchItems(0)
+  }, [category, userCountry, authLoaded])
 
-  async function fetchItems() {
-    setLoading(true)
+  async function fetchItems(from: number) {
+    if (from === 0) setLoading(true); else setLoadingMore(true)
     let query = supabase
       .from('items')
       .select('*, profiles(id, username, trust_score, total_ratings, completed_swaps)')
       .eq('status', 'available')
       .not('title', 'ilike', '[GIVEAWAY]%')
       .order('created_at', { ascending: false })
+      .range(from, from + PAGE_SIZE - 1)
 
     if (userCountry) query = query.eq('country', userCountry)
     if (category) query = query.eq('category', category)
 
     const { data } = await query
-    setItems((data as Item[]) || [])
-    setLoading(false)
+    const results = (data as Item[]) || []
+    setItems((prev) => from === 0 ? results : [...prev, ...results])
+    setHasMore(results.length === PAGE_SIZE)
+    setOffset(from + results.length)
+    if (from === 0) setLoading(false); else setLoadingMore(false)
   }
 
   const filtered = items.filter(
     (i) =>
+      !search ||
       i.title.toLowerCase().includes(search.toLowerCase()) ||
       i.description.toLowerCase().includes(search.toLowerCase())
   )
@@ -194,9 +205,7 @@ export default function HomePage() {
               key={cat}
               onClick={() => {
                 setCategory(cat)
-                if (isLoggedIn) {
-                  document.getElementById('browse')?.scrollIntoView({ behavior: 'smooth' })
-                }
+                document.getElementById('browse')?.scrollIntoView({ behavior: 'smooth' })
               }}
               className="bg-white border border-gray-100 rounded-2xl p-4 text-center hover:border-indigo-300 hover:shadow-md transition-all group"
             >
@@ -273,87 +282,93 @@ export default function HomePage() {
 
       {/* Browse / Items Section */}
       <div id="browse">
-        {!isLoggedIn ? (
-          <div className="bg-gradient-to-br from-indigo-600 to-purple-700 rounded-3xl p-10 text-center text-white">
-            <h2 className="text-3xl font-bold mb-3">Ready to start swapping?</h2>
-            <p className="text-indigo-100 text-lg mb-6">Join thousands of people trading items they love — for free.</p>
-            <Link href="/auth/signup" className="bg-white text-indigo-700 font-semibold px-8 py-3 rounded-xl hover:bg-indigo-50 transition-colors inline-flex items-center gap-2">
+        {!isLoggedIn && authLoaded && (
+          <div className="bg-gradient-to-br from-indigo-600 to-purple-700 rounded-3xl p-8 text-center text-white mb-8">
+            <h2 className="text-2xl font-bold mb-2">Sign up to swap these items</h2>
+            <p className="text-indigo-100 mb-5">Create a free account to make offers, post items, and start swapping.</p>
+            <Link href="/auth/signup" className="bg-white text-indigo-700 font-semibold px-7 py-2.5 rounded-xl hover:bg-indigo-50 transition-colors inline-flex items-center gap-2">
               Create Free Account <ArrowRight size={16} />
             </Link>
           </div>
+        )}
+
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-xl font-bold text-gray-900">
+            Browse Items {userCountry && <span className="text-indigo-600">in {userCountry}</span>}
+          </h2>
+          {isLoggedIn && (
+            <Link href="/items/new" className="bg-indigo-600 text-white text-sm font-semibold px-4 py-2 rounded-xl hover:bg-indigo-700 transition-colors">
+              + Post Item
+            </Link>
+          )}
+        </div>
+
+        <div className="flex flex-col sm:flex-row gap-3 mb-6">
+          <div className="relative flex-1">
+            <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+            <input
+              type="text"
+              placeholder="Search items..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="w-full pl-9 pr-4 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white text-sm"
+            />
+          </div>
+          <div className="relative">
+            <SlidersHorizontal size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+            <select
+              value={category}
+              onChange={(e) => setCategory(e.target.value as Category | '')}
+              className="pl-9 pr-8 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white text-sm appearance-none"
+            >
+              <option value="">All categories</option>
+              {CATEGORIES.map((c) => (
+                <option key={c} value={c}>{c}</option>
+              ))}
+            </select>
+          </div>
+        </div>
+
+        {loading ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+            {Array.from({ length: 8 }).map((_, i) => (
+              <div key={i} className="bg-white rounded-2xl h-64 animate-pulse border border-gray-100" />
+            ))}
+          </div>
+        ) : filtered.length === 0 ? (
+          <div className="text-center py-16">
+            <div className="text-6xl mb-4">{search || category ? '🔍' : '🌱'}</div>
+            <h3 className="text-lg font-bold text-gray-900 mb-2">
+              {search || category ? 'No items match your search' : 'No items yet'}
+            </h3>
+            <p className="text-gray-500 text-sm mb-6 max-w-xs mx-auto">
+              {search || category ? 'Try different keywords or clear the filters.' : 'Be the first to post something — it only takes a minute.'}
+            </p>
+            {(search || category) && (
+              <button
+                onClick={() => { setSearch(''); setCategory('') }}
+                className="border border-gray-200 text-gray-700 font-medium px-5 py-2.5 rounded-xl hover:bg-gray-50 transition-colors text-sm"
+              >
+                Clear filters
+              </button>
+            )}
+          </div>
         ) : (
           <>
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-xl font-bold text-gray-900">
-                Browse Items {userCountry && <span className="text-indigo-600">in {userCountry}</span>}
-              </h2>
-              <Link href="/items/new" className="bg-indigo-600 text-white text-sm font-semibold px-4 py-2 rounded-xl hover:bg-indigo-700 transition-colors">
-                + Post Item
-              </Link>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+              {filtered.map((item) => (
+                <ItemCard key={item.id} item={item} />
+              ))}
             </div>
-
-            <div className="flex flex-col sm:flex-row gap-3 mb-6">
-              <div className="relative flex-1">
-                <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-                <input
-                  type="text"
-                  placeholder="Search items..."
-                  value={search}
-                  onChange={(e) => setSearch(e.target.value)}
-                  className="w-full pl-9 pr-4 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white text-sm"
-                />
-              </div>
-              <div className="relative">
-                <SlidersHorizontal size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-                <select
-                  value={category}
-                  onChange={(e) => setCategory(e.target.value as Category | '')}
-                  className="pl-9 pr-8 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white text-sm appearance-none"
+            {hasMore && !search && (
+              <div className="text-center mt-8">
+                <button
+                  onClick={() => fetchItems(offset)}
+                  disabled={loadingMore}
+                  className="border border-gray-200 text-gray-700 font-medium px-8 py-2.5 rounded-xl hover:bg-gray-50 transition-colors text-sm disabled:opacity-50"
                 >
-                  <option value="">All categories</option>
-                  {CATEGORIES.map((c) => (
-                    <option key={c} value={c}>{c}</option>
-                  ))}
-                </select>
-              </div>
-            </div>
-
-            {loading ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
-                {Array.from({ length: 8 }).map((_, i) => (
-                  <div key={i} className="bg-white rounded-2xl h-64 animate-pulse border border-gray-100" />
-                ))}
-              </div>
-            ) : filtered.length === 0 ? (
-              <div className="text-center py-16">
-                <div className="text-6xl mb-4">{search || category ? '🔍' : '🌱'}</div>
-                <h3 className="text-lg font-bold text-gray-900 mb-2">
-                  {search || category ? 'No items match your search' : `No items in ${userCountry} yet`}
-                </h3>
-                <p className="text-gray-500 text-sm mb-6 max-w-xs mx-auto">
-                  {search || category
-                    ? 'Try different keywords or browse all categories.'
-                    : 'Be the first person in your country to post something. It only takes a minute.'}
-                </p>
-                <div className="flex flex-col sm:flex-row gap-3 justify-center">
-                  {(search || category) && (
-                    <button
-                      onClick={() => { setSearch(''); setCategory('') }}
-                      className="border border-gray-200 text-gray-700 font-medium px-5 py-2.5 rounded-xl hover:bg-gray-50 transition-colors text-sm"
-                    >
-                      Clear filters
-                    </button>
-                  )}
-                  <Link href="/items/new" className="bg-indigo-600 text-white font-semibold px-6 py-2.5 rounded-xl hover:bg-indigo-700 transition-colors text-sm">
-                    Post the First Item
-                  </Link>
-                </div>
-              </div>
-            ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
-                {filtered.map((item) => (
-                  <ItemCard key={item.id} item={item} />
-                ))}
+                  {loadingMore ? 'Loading...' : 'Load more'}
+                </button>
               </div>
             )}
           </>

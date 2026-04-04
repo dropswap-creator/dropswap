@@ -84,7 +84,7 @@ export default function NewItemPage() {
       ? customCategory.trim()
       : category
 
-    const { error: insertError } = await supabase.from('items').insert({
+    const { data: newItem, error: insertError } = await supabase.from('items').insert({
       user_id: userId,
       title,
       description,
@@ -94,12 +94,27 @@ export default function NewItemPage() {
       covers_delivery: coversDelivery,
       ...(estimatedValue ? { estimated_value: parseFloat(estimatedValue) } : {}),
       ...(condition ? { condition } : {}),
-    })
+    }).select('id').single()
 
     if (insertError) {
       setError(insertError.message)
       setLoading(false)
       return
+    }
+
+    // Notify users with matching wanted posts (fire and forget)
+    if (newItem?.id) {
+      fetch('/api/notify/wanted-match', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          itemId: newItem.id,
+          itemTitle: title.trim(),
+          category: finalCategory,
+          country: userCountry,
+          postedByUserId: userId,
+        }),
+      })
     }
 
     router.push('/')
