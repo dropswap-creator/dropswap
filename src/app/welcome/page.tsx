@@ -15,6 +15,8 @@ function WelcomeContent() {
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
   const [username, setUsername] = useState('')
+  const [needsUsername, setNeedsUsername] = useState(false)
+  const [usernameInput, setUsernameInput] = useState('')
   const [loaded, setLoaded] = useState(false)
   const fileRef = useRef<HTMLInputElement>(null)
   const router = useRouter()
@@ -28,6 +30,7 @@ function WelcomeContent() {
       setUserId(user.id)
       supabase.from('profiles').select('username, avatar_url, bio, country').eq('id', user.id).single().then(({ data }) => {
         if (data?.username) setUsername(data.username)
+        else setNeedsUsername(true)
         if (data?.avatar_url) setAvatarUrl(data.avatar_url)
         if (data?.bio) setBio(data.bio)
         if (data?.country) setCountry(data.country)
@@ -49,16 +52,34 @@ function WelcomeContent() {
 
   async function handleFinish() {
     if (!country) { setError('Please select your country to continue.'); return }
+    if (needsUsername && !usernameInput.trim()) { setError('Please choose a username to continue.'); return }
     if (!userId) return
     setSaving(true)
     setError('')
-    await supabase.from('profiles').upsert({
-      id: userId,
-      bio: bio || null,
-      avatar_url: avatarUrl || null,
-      country,
-      ...(username ? { username } : {}),
+
+    const finalUsername = username || usernameInput.trim()
+
+    const { data: { session } } = await supabase.auth.getSession()
+    if (!session) { setError('Session expired. Please log in again.'); setSaving(false); return }
+
+    const res = await fetch('/api/profile/setup', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${session.access_token}` },
+      body: JSON.stringify({
+        bio: bio || null,
+        avatarUrl: avatarUrl || null,
+        country,
+        ...(finalUsername ? { username: finalUsername } : {}),
+      }),
     })
+
+    if (!res.ok) {
+      const body = await res.json().catch(() => ({}))
+      setError(body.error || 'Failed to save your profile. Please try again.')
+      setSaving(false)
+      return
+    }
+
     const next = searchParams.get('next')
     window.location.replace(next || '/')
   }
@@ -102,6 +123,21 @@ function WelcomeContent() {
           </div>
           <p className="text-xs text-gray-400">{uploading ? 'Uploading...' : 'Tap to add a profile photo'}</p>
         </div>
+
+        {/* Username — only shown if not set at signup */}
+        {needsUsername && (
+          <div className="mb-4">
+            <label className="block text-sm font-medium text-gray-700 mb-1">Username <span className="text-red-400">*</span></label>
+            <input
+              type="text"
+              value={usernameInput}
+              onChange={(e) => { setUsernameInput(e.target.value.replace(/\s/g, '')); setError('') }}
+              maxLength={30}
+              placeholder="e.g. swapper123"
+              className="w-full px-3 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            />
+          </div>
+        )}
 
         {/* Bio */}
         <div className="mb-4">

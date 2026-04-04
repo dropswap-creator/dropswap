@@ -67,7 +67,14 @@ export default function MyProfilePage() {
   async function saveProfile() {
     if (!userId) return
     setSaving(true)
-    await supabase.from('profiles').update({ bio, country, username: username || null }).eq('id', userId)
+    const { data: { session } } = await supabase.auth.getSession()
+    if (session) {
+      await fetch('/api/profile/setup', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${session.access_token}` },
+        body: JSON.stringify({ bio, country, username: username || null, avatarUrl: profile?.avatar_url || null }),
+      })
+    }
     setSaving(false)
     setSaved(true)
     setTimeout(() => setSaved(false), 2000)
