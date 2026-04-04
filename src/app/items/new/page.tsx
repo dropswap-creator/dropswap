@@ -92,7 +92,7 @@ export default function NewItemPage() {
       images: uploadedUrls,
       country: userCountry,
       covers_delivery: coversDelivery,
-      ...(estimatedValue ? { estimated_value: parseFloat(estimatedValue) } : {}),
+      estimated_value: parseFloat(estimatedValue) || 0,
       ...(condition ? { condition } : {}),
     }).select('id').single()
 
@@ -238,13 +238,14 @@ export default function NewItemPage() {
 
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
-            Your item&apos;s estimated value <span className="text-gray-400 font-normal">(optional)</span>
+            Estimated value <span className="text-red-400">*</span>
           </label>
           <div className="relative">
             <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm">£</span>
             <input
+              required
               type="number"
-              min="0"
+              min="1"
               step="0.01"
               value={estimatedValue}
               onChange={(e) => setEstimatedValue(e.target.value)}
@@ -252,7 +253,7 @@ export default function NewItemPage() {
               placeholder="0.00"
             />
           </div>
-          <p className="text-xs text-gray-400 mt-1">If your item is worth more than what someone offers, you can request a cash top-up to cover the difference.</p>
+          <p className="text-xs text-gray-400 mt-1">Required for escrow protection. This is the amount the other party deposits as a guarantee — refunded automatically when the swap completes.</p>
         </div>
 
         <label className="flex items-start gap-3 cursor-pointer">

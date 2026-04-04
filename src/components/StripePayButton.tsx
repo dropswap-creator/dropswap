@@ -1,13 +1,14 @@
 'use client'
 
 import { useState } from 'react'
-import { CreditCard } from 'lucide-react'
+import { CreditCard, ShieldCheck } from 'lucide-react'
 
 interface StripePayButtonProps {
-  type: 'giveaway' | 'completion' | 'bond' | 'swap_fee'
+  type: 'giveaway' | 'swap_fee'
   swapId: string
   userId: string
-  itemValue?: number // only needed for bond
+  role?: 'requester' | 'receiver'
+  escrowAmount?: number   // item value in £ (not pence)
   label: string
 }
 
@@ -15,11 +16,15 @@ export default function StripePayButton({
   type,
   swapId,
   userId,
-  itemValue = 0,
+  role,
+  escrowAmount = 0,
   label,
 }: StripePayButtonProps) {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+
+  const totalGbp = (0.99 + escrowAmount).toFixed(2)
+  const hasEscrow = escrowAmount > 0
 
   async function handlePay() {
     setLoading(true)
@@ -28,7 +33,7 @@ export default function StripePayButton({
       const res = await fetch('/api/stripe/checkout', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ type, swapId, userId, itemValue }),
+        body: JSON.stringify({ type, swapId, userId, role, escrowAmount }),
       })
       const data = await res.json()
       if (data.url) {
@@ -44,7 +49,26 @@ export default function StripePayButton({
   }
 
   return (
-    <div>
+    <div className="space-y-3">
+      {hasEscrow && (
+        <div className="bg-white border border-gray-200 rounded-xl p-3 space-y-1.5 text-sm">
+          <div className="flex justify-between text-gray-600">
+            <span>Platform fee</span>
+            <span>£0.99</span>
+          </div>
+          <div className="flex justify-between text-gray-600">
+            <span className="flex items-center gap-1">
+              <ShieldCheck size={13} className="text-green-500" />
+              Escrow deposit <span className="text-gray-400 text-xs">(refunded on completion)</span>
+            </span>
+            <span>£{escrowAmount.toFixed(2)}</span>
+          </div>
+          <div className="flex justify-between font-semibold text-gray-900 border-t border-gray-100 pt-1.5">
+            <span>Total today</span>
+            <span>£{totalGbp}</span>
+          </div>
+        </div>
+      )}
       <button
         onClick={handlePay}
         disabled={loading}

@@ -5,48 +5,73 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!)
 
 export async function POST(req: NextRequest) {
   try {
-    const { type, itemValue, swapId, userId, itemId } = await req.json()
+    const { type, swapId, userId, itemId, escrowAmount, role } = await req.json()
 
-    let amount: number
-    let description: string
+    const BASE = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.dropswap.co.uk'
 
-    if (type === 'giveaway' || type === 'swap_fee') {
-      amount = 99 // £0.99 in pence
-      description = type === 'giveaway' ? 'DropSwap — Giveaway claim fee' : 'DropSwap — Swap fee'
-    } else {
-      return NextResponse.json({ error: 'Invalid payment type' }, { status: 400 })
+    if (type === 'giveaway') {
+      const session = await stripe.checkout.sessions.create({
+        payment_method_types: ['card'],
+        line_items: [{
+          price_data: {
+            currency: 'gbp',
+            product_data: { name: 'DropSwap — Giveaway claim fee' },
+            unit_amount: 99,
+          },
+          quantity: 1,
+        }],
+        mode: 'payment',
+        success_url: `${BASE}/giveaways/${itemId}/claimed`,
+        cancel_url: `${BASE}/giveaways/${itemId}/claim`,
+        metadata: { type, itemId, userId },
+      })
+      return NextResponse.json({ url: session.url })
     }
 
-    const session = await stripe.checkout.sessions.create({
-      payment_method_types: ['card'],
-      line_items: [
+    if (type === 'swap_fee') {
+      const escrowPence = Math.round((escrowAmount || 0) * 100)
+      const lineItems: Stripe.Checkout.SessionCreateParams.LineItem[] = [
         {
           price_data: {
             currency: 'gbp',
-            product_data: {
-              name: description,
-            },
-            unit_amount: amount,
+            product_data: { name: 'DropSwap — Platform fee' },
+            unit_amount: 99,
           },
           quantity: 1,
         },
-      ],
-      mode: 'payment',
-      success_url: type === 'giveaway'
-        ? `${process.env.NEXT_PUBLIC_SITE_URL}/giveaways/${itemId}/claimed`
-        : `${process.env.NEXT_PUBLIC_SITE_URL}/payment/success?swapId=${swapId}`,
-      cancel_url: type === 'giveaway'
-        ? `${process.env.NEXT_PUBLIC_SITE_URL}/giveaways/${itemId}/claim`
-        : `${process.env.NEXT_PUBLIC_SITE_URL}/swaps/${swapId}?payment=cancelled`,
-      metadata: {
-        type,
-        ...(swapId ? { swapId } : {}),
-        ...(userId ? { userId } : {}),
-        ...(itemId ? { itemId } : {}),
-      },
-    })
+      ]
 
-    return NextResponse.json({ url: session.url })
+      if (escrowPence > 0) {
+        lineItems.push({
+          price_data: {
+            currency: 'gbp',
+            product_data: {
+              name: 'DropSwap — Escrow deposit (refunded automatically on swap completion)',
+            },
+            unit_amount: escrowPence,
+          },
+          quantity: 1,
+        })
+      }
+
+      const session = await stripe.checkout.sessions.create({
+        payment_method_types: ['card'],
+        line_items: lineItems,
+        mode: 'payment',
+        success_url: `${BASE}/payment/success?swapId=${swapId}`,
+        cancel_url: `${BASE}/swaps/${swapId}?payment=cancelled`,
+        metadata: {
+          type,
+          swapId,
+          userId,
+          role: role || '',
+          escrowPence: escrowPence.toString(),
+        },
+      })
+      return NextResponse.json({ url: session.url })
+    }
+
+    return NextResponse.json({ error: 'Invalid payment type' }, { status: 400 })
   } catch (err: any) {
     return NextResponse.json({ error: err.message }, { status: 500 })
   }
