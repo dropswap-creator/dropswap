@@ -60,8 +60,7 @@ function WelcomeContent() {
       ...(username ? { username } : {}),
     })
     const next = searchParams.get('next')
-    router.replace(next || '/')
-    router.refresh()
+    window.location.replace(next || '/')
   }
 
   if (!loaded) {
