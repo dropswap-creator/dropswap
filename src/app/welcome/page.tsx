@@ -52,13 +52,16 @@ function WelcomeContent() {
     if (!userId) return
     setSaving(true)
     setError('')
-    await supabase.from('profiles').update({
+    await supabase.from('profiles').upsert({
+      id: userId,
       bio: bio || null,
       avatar_url: avatarUrl || null,
       country,
-    }).eq('id', userId)
+      ...(username ? { username } : {}),
+    })
     const next = searchParams.get('next')
-    router.push(next || '/')
+    router.replace(next || '/')
+    router.refresh()
   }
 
   if (!loaded) {
