@@ -222,6 +222,14 @@ export default function SwapDetailPage() {
 
   const isRequester = userId === swap.requester_id
   const isReceiver = userId === swap.receiver_id
+
+  const requesterEscrowAmount: number | null = swap.receiver_item?.estimated_value ?? null
+  const receiverEscrowAmount: number | null = swap.requester_item?.estimated_value ?? null
+  const requesterMissingValue = !requesterEscrowAmount
+  const receiverMissingValue = !receiverEscrowAmount
+  const myEscrowPence = isRequester ? (swap as any).requester_escrow_amount : (swap as any).receiver_escrow_amount
+  const theirEscrowPence = isRequester ? (swap as any).receiver_escrow_amount : (swap as any).requester_escrow_amount
+  const hasEscrowBanner = isActive && swap.status !== 'pending' && (myEscrowPence > 0 || theirEscrowPence > 0)
   const otherParty = isRequester ? swap.receiver : swap.requester
   const myItem = isRequester ? swap.requester_item : swap.receiver_item
   const theirItem = isRequester ? swap.receiver_item : swap.requester_item
@@ -370,27 +378,23 @@ export default function SwapDetailPage() {
       )}
 
       {/* Requester fee — pay platform fee + escrow to send offer */}
-      {swap.status === 'pending' && isRequester && !requesterPaid && userId && (() => {
-        const escrowAmount = swap.receiver_item?.estimated_value ?? null
-        const missingValue = escrowAmount === null || escrowAmount === 0
-        return (
-          <div className="bg-indigo-50 border border-indigo-200 rounded-2xl p-5">
-            <h2 className="font-semibold text-gray-900 mb-1">Confirm your offer</h2>
-            <p className="text-sm text-gray-600 mb-4">
-              A £0.99 platform fee is charged to send your offer.
-              {!missingValue && ` You'll also place a £${escrowAmount!.toFixed(2)} escrow deposit (the estimated value of their item) which is automatically refunded when both parties confirm receipt.`}
-            </p>
-            {missingValue ? (
-              <div className="bg-amber-50 border border-amber-200 rounded-xl p-3 text-sm text-amber-800">
-                ⚠️ Escrow protection is unavailable because the other item has no estimated value set. The swap can still proceed with just the £0.99 platform fee, but neither party is protected.
-                <StripePayButton type="swap_fee" swapId={id} userId={userId} role="requester" escrowAmount={0} label="Pay £0.99 & Send Offer" />
-              </div>
-            ) : (
-              <StripePayButton type="swap_fee" swapId={id} userId={userId} role="requester" escrowAmount={escrowAmount!} label="Pay & Send Offer" />
-            )}
-          </div>
-        )
-      })()}
+      {swap.status === 'pending' && isRequester && !requesterPaid && userId && (
+        <div className="bg-indigo-50 border border-indigo-200 rounded-2xl p-5">
+          <h2 className="font-semibold text-gray-900 mb-1">Confirm your offer</h2>
+          <p className="text-sm text-gray-600 mb-4">
+            A £0.99 platform fee is charged to send your offer.
+            {!requesterMissingValue && ` You'll also place a £${requesterEscrowAmount!.toFixed(2)} escrow deposit (the estimated value of their item) which is automatically refunded when both parties confirm receipt.`}
+          </p>
+          {requesterMissingValue ? (
+            <div className="bg-amber-50 border border-amber-200 rounded-xl p-3 text-sm text-amber-800 space-y-2">
+              <p>⚠️ Escrow protection unavailable — the other item has no estimated value. The swap can still proceed with just the £0.99 fee, but neither party is protected.</p>
+              <StripePayButton type="swap_fee" swapId={id} userId={userId} role="requester" escrowAmount={0} label="Pay £0.99 & Send Offer" />
+            </div>
+          ) : (
+            <StripePayButton type="swap_fee" swapId={id} userId={userId} role="requester" escrowAmount={requesterEscrowAmount!} label="Pay & Send Offer" />
+          )}
+        </div>
+      )}
 
       {swap.status === 'pending' && isRequester && requesterPaid && (
         <div className="bg-green-50 border border-green-200 rounded-2xl p-4 text-sm text-green-700">
@@ -399,43 +403,32 @@ export default function SwapDetailPage() {
       )}
 
       {/* Receiver fee — pay platform fee + escrow to accept */}
-      {swap.status === 'pending' && isReceiver && !paidFee && userId && (() => {
-        const escrowAmount = swap.requester_item?.estimated_value ?? null
-        const missingValue = escrowAmount === null || escrowAmount === 0
-        return (
-          <div className="bg-indigo-50 border border-indigo-200 rounded-2xl p-5">
-            <h2 className="font-semibold text-gray-900 mb-1">Accept this swap</h2>
-            <p className="text-sm text-gray-600 mb-4">
-              A £0.99 platform fee is charged to accept.
-              {!missingValue && ` You'll also place a £${escrowAmount!.toFixed(2)} escrow deposit (the estimated value of their item) which is automatically refunded when both parties confirm receipt.`}
-            </p>
-            {missingValue ? (
-              <div className="bg-amber-50 border border-amber-200 rounded-xl p-3 text-sm text-amber-800 space-y-2">
-                <p>⚠️ Escrow protection is unavailable because the other item has no estimated value set. You can still accept with just the £0.99 fee, but neither party is protected.</p>
-                <StripePayButton type="swap_fee" swapId={id} userId={userId} role="receiver" escrowAmount={0} label="Pay £0.99 & Accept Swap" />
-              </div>
-            ) : (
-              <StripePayButton type="swap_fee" swapId={id} userId={userId} role="receiver" escrowAmount={escrowAmount!} label="Pay & Accept Swap" />
-            )}
-          </div>
-        )
-      })()}
+      {swap.status === 'pending' && isReceiver && !paidFee && userId && (
+        <div className="bg-indigo-50 border border-indigo-200 rounded-2xl p-5">
+          <h2 className="font-semibold text-gray-900 mb-1">Accept this swap</h2>
+          <p className="text-sm text-gray-600 mb-4">
+            A £0.99 platform fee is charged to accept.
+            {!receiverMissingValue && ` You'll also place a £${receiverEscrowAmount!.toFixed(2)} escrow deposit (the estimated value of their item) which is automatically refunded when both parties confirm receipt.`}
+          </p>
+          {receiverMissingValue ? (
+            <div className="bg-amber-50 border border-amber-200 rounded-xl p-3 text-sm text-amber-800 space-y-2">
+              <p>⚠️ Escrow protection unavailable — the other item has no estimated value. You can still accept with just the £0.99 fee, but neither party is protected.</p>
+              <StripePayButton type="swap_fee" swapId={id} userId={userId} role="receiver" escrowAmount={0} label="Pay £0.99 & Accept Swap" />
+            </div>
+          ) : (
+            <StripePayButton type="swap_fee" swapId={id} userId={userId} role="receiver" escrowAmount={receiverEscrowAmount!} label="Pay & Accept Swap" />
+          )}
         </div>
       )}
 
       {/* Escrow status banner */}
-      {isActive && swap.status !== 'pending' && (() => {
-        const myEscrow = isRequester ? (swap as any).requester_escrow_amount : (swap as any).receiver_escrow_amount
-        const theirEscrow = isRequester ? (swap as any).receiver_escrow_amount : (swap as any).requester_escrow_amount
-        if (!myEscrow && !theirEscrow) return null
-        return (
-          <div className="bg-green-50 border border-green-200 rounded-2xl p-4 text-sm text-green-800 space-y-1">
-            <p className="font-semibold flex items-center gap-2">🔒 Escrow active</p>
-            {myEscrow > 0 && <p>Your deposit: <strong>£{(myEscrow / 100).toFixed(2)}</strong> — refunded automatically once both parties confirm receipt.</p>}
-            {theirEscrow > 0 && <p>Their deposit: <strong>£{(theirEscrow / 100).toFixed(2)}</strong> — held in escrow.</p>}
-          </div>
-        )
-      })()}
+      {hasEscrowBanner && (
+        <div className="bg-green-50 border border-green-200 rounded-2xl p-4 text-sm text-green-800 space-y-1">
+          <p className="font-semibold">🔒 Escrow active</p>
+          {myEscrowPence > 0 && <p>Your deposit: <strong>£{(myEscrowPence / 100).toFixed(2)}</strong> — refunded automatically once both parties confirm receipt.</p>}
+          {theirEscrowPence > 0 && <p>Their deposit: <strong>£{(theirEscrowPence / 100).toFixed(2)}</strong> — held in escrow.</p>}
+        </div>
+      )}
 
       {/* Rating */}
       {canRate && (
