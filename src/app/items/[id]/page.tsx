@@ -273,7 +273,7 @@ export default function ItemPage() {
                 </p>
               ) : myItems.length === 0 ? (
                 <p className="text-gray-500 text-sm bg-gray-50 px-4 py-3 rounded-xl">
-                  You need an available item in {item.country} to make an offer.{' '}
+                  You need an available item to make an offer.{' '}
                   <Link href="/items/new" className="text-indigo-600 underline">Post one</Link>
                 </p>
               ) : (

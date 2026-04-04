@@ -35,7 +35,7 @@ export default function AdminPage() {
   useEffect(() => {
     async function init() {
       const { data: { user } } = await supabase.auth.getUser()
-      if (!user || (ADMIN_EMAIL && user.email !== ADMIN_EMAIL)) {
+      if (!user || !ADMIN_EMAIL || user.email !== ADMIN_EMAIL) {
         router.push('/')
         return
       }
