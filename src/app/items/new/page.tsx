@@ -317,13 +317,12 @@ export default function NewItemPage() {
 
         {category === 'Food & Drinks' && (
           <div className="bg-amber-50 border border-amber-200 rounded-xl p-4">
-            <p className="text-amber-800 font-semibold text-sm mb-2">⚠️ Food & Drink Rules</p>
+            <p className="text-amber-800 font-semibold text-sm mb-2">⚠️ Strict Food & Drink Rules</p>
             <ul className="text-amber-700 text-sm space-y-1">
-              <li>• All food and drink items <strong>must be factory sealed or vacuum packed</strong> — no homemade, opened, or loose food</li>
-              <li>• Seeds (plant/garden seeds) are allowed and exempt from this rule</li>
-              <li>• Alcohol is not permitted</li>
+              <li>• <strong>Factory sealed and packaged items only</strong> — e.g. crisps, chocolate boxes, coffee, protein powder, tinned goods</li>
+              <li>• <strong>No homemade, opened, or loose food of any kind</strong> — listings will be removed immediately</li>
+              <li>• No alcohol permitted</li>
               <li>• You must include the expiry date in your description</li>
-              <li>• Listings not meeting these requirements will be removed</li>
             </ul>
           </div>
         )}

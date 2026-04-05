@@ -11,7 +11,6 @@ export type Category =
   | 'Furniture'
   | 'Tools'
   | 'Baby & Kids'
-  | 'Plants & Garden'
   | 'Experiences & Services'
   | 'Vehicles & Transport'
   | 'Pet Supplies'
@@ -31,7 +30,6 @@ export const CATEGORIES: Category[] = [
   'Furniture',
   'Tools',
   'Baby & Kids',
-  'Plants & Garden',
   'Experiences & Services',
   'Vehicles & Transport',
   'Pet Supplies',
