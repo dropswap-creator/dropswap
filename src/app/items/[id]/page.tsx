@@ -40,6 +40,11 @@ export default function ItemPage() {
       ])
 
       if (!itemData) { router.push('/'); return }
+      // Redirect giveaway items to the giveaway claim page
+      if (itemData.title?.startsWith('[GIVEAWAY]')) {
+        router.push(`/giveaways/${itemData.id}/claim`)
+        return
+      }
       setItem(itemData as Item)
       setOwner(itemData.profiles as Profile)
       setCurrentUser(user?.id ?? null)
