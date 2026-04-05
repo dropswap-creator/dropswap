@@ -12,6 +12,7 @@ export default function ClaimGiveawayPage() {
   const router = useRouter()
   const supabase = createClient()
   const [item, setItem] = useState<Item | null>(null)
+  const [userId, setUserId] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
   const [paying, setPaying] = useState(false)
   const [error, setError] = useState('')
@@ -20,6 +21,7 @@ export default function ClaimGiveawayPage() {
     async function load() {
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) { router.push('/auth/login'); return }
+      setUserId(user.id)
 
       const { data } = await supabase
         .from('items')
@@ -42,7 +44,7 @@ export default function ClaimGiveawayPage() {
       const res = await fetch('/api/stripe/checkout', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ type: 'giveaway', itemId: id }),
+        body: JSON.stringify({ type: 'giveaway', itemId: id, userId }),
       })
       const data = await res.json()
       if (data.url) {

@@ -15,10 +15,10 @@ export async function POST(req: NextRequest) {
     const BASE = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.dropswap.co.uk'
 
     if (type === 'giveaway') {
-      // Verify item exists and belongs to this user
-      const { data: item } = await supabaseAdmin.from('items').select('user_id').eq('id', itemId).single()
-      if (!item || item.user_id !== userId) {
-        return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+      // Verify item exists and is available (claimer is paying, not the owner)
+      const { data: item } = await supabaseAdmin.from('items').select('id, status').eq('id', itemId).single()
+      if (!item || item.status !== 'available') {
+        return NextResponse.json({ error: 'Item not available' }, { status: 403 })
       }
 
       const session = await stripe.checkout.sessions.create({
