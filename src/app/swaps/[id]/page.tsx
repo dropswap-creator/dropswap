@@ -159,7 +159,9 @@ export default function SwapDetailPage() {
     const file = files[0]
     if (file.size > 50 * 1024 * 1024) return
     setVideoFile(file)
-    setVideoPreview(URL.createObjectURL(file))
+    const reader = new FileReader()
+    reader.onload = (e) => setVideoPreview(e.target?.result as string)
+    reader.readAsDataURL(file)
   }
 
   async function updateSwapStatus(newStatus: SwapStatus) {

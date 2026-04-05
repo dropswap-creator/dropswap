@@ -42,8 +42,11 @@ export default function NewGiveawayPage() {
     if (!files) return
     const newFiles = Array.from(files).slice(0, 4 - images.length)
     setImages((prev) => [...prev, ...newFiles])
-    const urls = newFiles.map((f) => URL.createObjectURL(f))
-    setPreviews((prev) => [...prev, ...urls])
+    newFiles.forEach((f) => {
+      const reader = new FileReader()
+      reader.onload = (e) => setPreviews((prev) => [...prev, e.target?.result as string])
+      reader.readAsDataURL(f)
+    })
   }
 
   function removeImage(index: number) {
