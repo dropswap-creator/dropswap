@@ -46,15 +46,21 @@ export default function NewItemPage() {
     getUser()
   }, [])
 
-  function handleFiles(files: FileList | null) {
+  function readFileAsDataURL(file: File): Promise<string> {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader()
+      reader.onload = () => resolve(reader.result as string)
+      reader.onerror = reject
+      reader.readAsDataURL(file)
+    })
+  }
+
+  async function handleFiles(files: FileList | null) {
     if (!files) return
     const newFiles = Array.from(files).slice(0, 4 - images.length)
     setImages((prev) => [...prev, ...newFiles])
-    newFiles.forEach((f) => {
-      const reader = new FileReader()
-      reader.onload = (e) => setPreviews((prev) => [...prev, e.target?.result as string])
-      reader.readAsDataURL(f)
-    })
+    const dataUrls = await Promise.all(newFiles.map(readFileAsDataURL))
+    setPreviews((prev) => [...prev, ...dataUrls])
   }
 
   function removeImage(index: number) {
@@ -62,14 +68,13 @@ export default function NewItemPage() {
     setPreviews((prev) => prev.filter((_, i) => i !== index))
   }
 
-  function handleVideo(files: FileList | null) {
+  async function handleVideo(files: FileList | null) {
     if (!files || !files[0]) return
     const file = files[0]
     if (file.size > 50 * 1024 * 1024) { setError('Video must be under 50MB'); return }
     setVideo(file)
-    const reader = new FileReader()
-    reader.onload = (e) => setVideoPreview(e.target?.result as string)
-    reader.readAsDataURL(file)
+    const dataUrl = await readFileAsDataURL(file)
+    setVideoPreview(dataUrl)
   }
 
   async function handleSubmit(e: React.FormEvent) {
