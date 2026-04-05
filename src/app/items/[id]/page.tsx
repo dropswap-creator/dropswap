@@ -177,6 +177,12 @@ export default function ItemPage() {
               <div className="flex items-center justify-center h-full text-gray-300 text-6xl">📦</div>
             )}
           </div>
+          {/* Video */}
+          {(item as any).video_url && (
+            <div className="mt-3 rounded-xl overflow-hidden bg-black">
+              <video src={(item as any).video_url} controls className="w-full max-h-72 object-contain" />
+            </div>
+          )}
         </div>
 
         {/* Details */}

@@ -107,7 +107,11 @@ export default function EditItemPage() {
       const ext = newVideoFile.name.split('.').pop()
       const path = `items/${item.user_id}/video-${Date.now()}.${ext}`
       const { error: videoError } = await supabase.storage.from('images').upload(path, newVideoFile)
-      if (videoError) { setError('Video upload failed: ' + videoError.message); setSaving(false); return }
+      if (videoError) {
+        setError('Video upload failed: ' + videoError.message)
+        setSaving(false)
+        return
+      }
       videoUrl = supabase.storage.from('images').getPublicUrl(path).data.publicUrl
     }
     if (removeVideo) videoUrl = null
