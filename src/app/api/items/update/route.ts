@@ -12,19 +12,22 @@ export async function POST(req: NextRequest) {
   const { data: { user } } = await supabaseAdmin.auth.getUser(authHeader.replace('Bearer ', ''))
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
-  const { itemId, title, description, category, estimatedValue, coversDelivery } = await req.json()
+  const { itemId, title, description, category, estimatedValue, images, videoUrl } = await req.json()
 
   // Verify ownership
   const { data: item } = await supabaseAdmin.from('items').select('user_id').eq('id', itemId).single()
   if (!item || item.user_id !== user.id) return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
 
-  const { error } = await supabaseAdmin.from('items').update({
+  const updateData: Record<string, any> = {
     title,
     description,
     category,
-    covers_delivery: coversDelivery,
     estimated_value: estimatedValue ? parseFloat(estimatedValue) : null,
-  }).eq('id', itemId)
+  }
+  if (images !== undefined) updateData.images = images
+  if (videoUrl !== undefined) updateData.video_url = videoUrl
+
+  const { error } = await supabaseAdmin.from('items').update(updateData).eq('id', itemId)
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
   return NextResponse.json({ ok: true })
