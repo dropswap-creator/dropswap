@@ -75,7 +75,7 @@ export default function EditItemPage() {
   function handleVideo(files: FileList | null) {
     if (!files || !files[0]) return
     const file = files[0]
-    if (file.size > 500 * 1024 * 1024) { setError('Video must be under 500MB'); return }
+    if (file.size > 50 * 1024 * 1024) { setError('Video must be under 50MB'); return }
     if (newVideoPreview) URL.revokeObjectURL(newVideoPreview)
     setNewVideoFile(file)
     setNewVideoPreview(URL.createObjectURL(file))
@@ -174,7 +174,7 @@ export default function EditItemPage() {
         {/* Video */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
-            Video <span className="text-gray-400 font-normal">(optional, max 500MB)</span>
+            Video <span className="text-gray-400 font-normal">(optional, max 50MB)</span>
           </label>
           {(newVideoPreview || (existingVideoUrl && !removeVideo)) ? (
             <div className="relative rounded-xl overflow-hidden bg-black">

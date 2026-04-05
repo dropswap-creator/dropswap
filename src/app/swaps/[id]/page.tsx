@@ -157,7 +157,7 @@ export default function SwapDetailPage() {
   function handleVideoSelect(files: FileList | null) {
     if (!files || !files[0]) return
     const file = files[0]
-    if (file.size > 500 * 1024 * 1024) return
+    if (file.size > 50 * 1024 * 1024) return
     if (videoPreview) URL.revokeObjectURL(videoPreview)
     setVideoFile(file)
     setVideoPreview(URL.createObjectURL(file))
