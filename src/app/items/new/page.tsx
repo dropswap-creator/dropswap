@@ -5,7 +5,6 @@ import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase'
 import { CATEGORIES } from '@/lib/types'
 import { Upload, X } from 'lucide-react'
-import Image from 'next/image'
 
 export default function NewItemPage() {
   const [title, setTitle] = useState('')
@@ -133,7 +132,8 @@ export default function NewItemPage() {
           <div className="grid grid-cols-4 gap-2 mb-2">
             {previews.map((src, i) => (
               <div key={i} className="relative aspect-square rounded-lg overflow-hidden bg-gray-100">
-                <Image src={src} alt="" fill className="object-cover" />
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={src} alt="" className="w-full h-full object-cover" />
                 <button
                   type="button"
                   onClick={() => removeImage(i)}

@@ -4,7 +4,6 @@ import { useState, useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase'
 import { Upload, X, Gift } from 'lucide-react'
-import Image from 'next/image'
 
 export default function NewGiveawayPage() {
   const [title, setTitle] = useState('')
@@ -100,7 +99,8 @@ export default function NewGiveawayPage() {
           <div className="grid grid-cols-4 gap-2 mb-2">
             {previews.map((src, i) => (
               <div key={i} className="relative aspect-square rounded-lg overflow-hidden bg-gray-100">
-                <Image src={src} alt="" fill className="object-cover" />
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={src} alt="" className="w-full h-full object-cover" />
                 <button type="button" onClick={() => removeImage(i)} className="absolute top-1 right-1 bg-black/60 text-white rounded-full p-0.5">
                   <X size={12} />
                 </button>
