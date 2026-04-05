@@ -30,6 +30,7 @@ export default function ItemPage() {
   const [reporting, setReporting] = useState(false)
   const [reportReason, setReportReason] = useState('')
   const [showReportBox, setShowReportBox] = useState(false)
+  const [offerError, setOfferError] = useState('')
 
   useEffect(() => {
     async function load() {
@@ -70,32 +71,35 @@ export default function ItemPage() {
   async function sendOffer() {
     if (!selectedMyItem || !currentUser || !item) return
     setOffering(true)
+    setOfferError('')
     const { error } = await supabase.from('swaps').insert({
       requester_id: currentUser,
       receiver_id: item.user_id,
       requester_item_id: selectedMyItem,
       receiver_item_id: item.id,
     })
-    if (!error) {
-      await supabase.from('items').update({ status: 'in_swap' }).eq('id', selectedMyItem)
-      // Get the new swap id to send email notification
-      const { data: newSwap } = await supabase
-        .from('swaps')
-        .select('id')
-        .eq('requester_id', currentUser)
-        .eq('receiver_item_id', item.id)
-        .order('created_at', { ascending: false })
-        .limit(1)
-        .single()
-      if (newSwap) {
-        fetch('/api/notify/swap', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ swapId: newSwap.id }),
-        })
-      }
-      setOfferSent(true)
+    if (error) {
+      setOfferError('Failed to send offer. Please try again.')
+      setOffering(false)
+      return
     }
+    await supabase.from('items').update({ status: 'in_swap' }).eq('id', selectedMyItem)
+    const { data: newSwap } = await supabase
+      .from('swaps')
+      .select('id')
+      .eq('requester_id', currentUser)
+      .eq('receiver_item_id', item.id)
+      .order('created_at', { ascending: false })
+      .limit(1)
+      .single()
+    if (newSwap) {
+      fetch('/api/notify/swap', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ swapId: newSwap.id }),
+      })
+    }
+    setOfferSent(true)
     setOffering(false)
   }
 
@@ -103,14 +107,16 @@ export default function ItemPage() {
     if (!currentUser || !item || !reportReason.trim()) return
     if (reportReason.trim().length < 5) return
     setReporting(true)
-    await supabase.from('reports').insert({
+    const { error } = await supabase.from('reports').insert({
       item_id: item.id,
       reporter_id: currentUser,
       reason: reportReason.trim().slice(0, 500),
     })
-    setReported(true)
+    if (!error) {
+      setReported(true)
+      setShowReportBox(false)
+    }
     setReporting(false)
-    setShowReportBox(false)
   }
 
   async function deleteItem() {
@@ -299,6 +305,7 @@ export default function ItemPage() {
                       ))}
                     </select>
                   </div>
+                  {offerError && <p className="text-red-500 text-sm bg-red-50 px-3 py-2 rounded-lg">{offerError}</p>}
                   <button
                     onClick={sendOffer}
                     disabled={!selectedMyItem || offering}

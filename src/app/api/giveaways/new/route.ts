@@ -12,12 +12,21 @@ export async function POST(req: NextRequest) {
   const { data: { user } } = await supabaseAdmin.auth.getUser(authHeader.replace('Bearer ', ''))
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
-  const { itemId } = await req.json()
+  const { title, description, images, country, covers_delivery } = await req.json()
+  if (!title || !description || !images?.length || !country) {
+    return NextResponse.json({ error: 'Missing fields' }, { status: 400 })
+  }
 
-  const { data: item } = await supabaseAdmin.from('items').select('user_id').eq('id', itemId).single()
-  if (!item || item.user_id !== user.id) return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+  const { error } = await supabaseAdmin.from('items').insert({
+    user_id: user.id,
+    title: `[GIVEAWAY] ${title.trim()}`,
+    description: description.trim(),
+    category: 'Other',
+    images,
+    country,
+    covers_delivery: covers_delivery || false,
+  })
 
-  const { error } = await supabaseAdmin.from('items').delete().eq('id', itemId)
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
   return NextResponse.json({ ok: true })
 }

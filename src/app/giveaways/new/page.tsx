@@ -69,17 +69,16 @@ export default function NewGiveawayPage() {
       uploadedUrls.push(publicUrl)
     }
 
-    const { error: insertError } = await supabase.from('items').insert({
-      user_id: userId,
-      title: `[GIVEAWAY] ${title}`,
-      description,
-      category: 'Other',
-      images: uploadedUrls,
-      country: userCountry,
-      covers_delivery: coversDelivery,
-    })
+    const { data: { session } } = await supabase.auth.getSession()
+    if (!session) { setError('Not logged in'); setLoading(false); return }
 
-    if (insertError) { setError(insertError.message); setLoading(false); return }
+    const res = await fetch('/api/giveaways/new', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${session.access_token}` },
+      body: JSON.stringify({ title, description, images: uploadedUrls, country: userCountry, covers_delivery: coversDelivery }),
+    })
+    const json = await res.json()
+    if (!res.ok) { setError(json.error || 'Failed to post'); setLoading(false); return }
     router.push('/giveaways')
   }
 

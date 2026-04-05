@@ -1,7 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server'
 import Stripe from 'stripe'
+import { createClient } from '@supabase/supabase-js'
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!)
+const supabaseAdmin = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.SUPABASE_SERVICE_ROLE_KEY!
+)
 
 export async function POST(req: NextRequest) {
   try {
@@ -10,6 +15,12 @@ export async function POST(req: NextRequest) {
     const BASE = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.dropswap.co.uk'
 
     if (type === 'giveaway') {
+      // Verify item exists and belongs to this user
+      const { data: item } = await supabaseAdmin.from('items').select('user_id').eq('id', itemId).single()
+      if (!item || item.user_id !== userId) {
+        return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+      }
+
       const session = await stripe.checkout.sessions.create({
         payment_method_types: ['card'],
         line_items: [{
@@ -29,6 +40,16 @@ export async function POST(req: NextRequest) {
     }
 
     if (type === 'swap_fee') {
+      // Verify swap exists and userId is a participant
+      const { data: swap } = await supabaseAdmin
+        .from('swaps')
+        .select('requester_id, receiver_id')
+        .eq('id', swapId)
+        .single()
+      if (!swap || (swap.requester_id !== userId && swap.receiver_id !== userId)) {
+        return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+      }
+
       const escrowPence = Math.round((escrowAmount || 0) * 100)
       const lineItems: Stripe.Checkout.SessionCreateParams.LineItem[] = [
         {

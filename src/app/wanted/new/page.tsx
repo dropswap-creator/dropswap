@@ -38,15 +38,16 @@ export default function NewWantedPage() {
     setLoading(true)
     setError('')
 
-    const { error: insertError } = await supabase.from('wanted_posts').insert({
-      user_id: userId,
-      title: title.trim(),
-      description: description.trim(),
-      category,
-      country: userCountry,
-    })
+    const { data: { session } } = await supabase.auth.getSession()
+    if (!session) { setError('Not logged in'); setLoading(false); return }
 
-    if (insertError) { setError(insertError.message); setLoading(false); return }
+    const res = await fetch('/api/wanted/new', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${session.access_token}` },
+      body: JSON.stringify({ title: title.trim(), description: description.trim(), category, country: userCountry }),
+    })
+    const json = await res.json()
+    if (!res.ok) { setError(json.error || 'Failed to post'); setLoading(false); return }
     router.push('/wanted')
   }
 

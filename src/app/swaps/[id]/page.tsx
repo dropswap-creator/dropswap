@@ -126,8 +126,9 @@ export default function SwapDetailPage() {
     e.preventDefault()
     if (!text.trim() || !userId) return
     setSending(true)
-    await supabase.from('messages').insert({ swap_id: id, sender_id: userId, content: text.trim() })
-    setText('')
+    const content = text.trim()
+    const { error } = await supabase.from('messages').insert({ swap_id: id, sender_id: userId, content })
+    if (!error) setText('')
     setSending(false)
   }
 

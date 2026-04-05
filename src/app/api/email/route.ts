@@ -22,6 +22,10 @@ function btn(href: string, label: string) {
 }
 
 export async function POST(req: NextRequest) {
+  if (!process.env.RESEND_API_KEY) {
+    return NextResponse.json({ error: 'Email not configured' }, { status: 500 })
+  }
+
   const { type, to, data } = await req.json()
 
   try {
