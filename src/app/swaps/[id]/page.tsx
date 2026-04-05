@@ -223,6 +223,12 @@ export default function SwapDetailPage() {
   const isRequester = userId === swap.requester_id
   const isReceiver = userId === swap.receiver_id
 
+  const otherParty = isRequester ? swap.receiver : swap.requester
+  const myItem = isRequester ? swap.requester_item : swap.receiver_item
+  const theirItem = isRequester ? swap.receiver_item : swap.requester_item
+  const currentStep = getStepIndex(swap.status)
+  const isActive = !['completed', 'declined', 'cancelled', 'disputed'].includes(swap.status)
+
   const requesterEscrowAmount: number | null = swap.receiver_item?.estimated_value ?? null
   const receiverEscrowAmount: number | null = swap.requester_item?.estimated_value ?? null
   const requesterMissingValue = !requesterEscrowAmount
@@ -230,11 +236,6 @@ export default function SwapDetailPage() {
   const myEscrowPence = isRequester ? (swap as any).requester_escrow_amount : (swap as any).receiver_escrow_amount
   const theirEscrowPence = isRequester ? (swap as any).receiver_escrow_amount : (swap as any).requester_escrow_amount
   const hasEscrowBanner = isActive && swap.status !== 'pending' && (myEscrowPence > 0 || theirEscrowPence > 0)
-  const otherParty = isRequester ? swap.receiver : swap.requester
-  const myItem = isRequester ? swap.requester_item : swap.receiver_item
-  const theirItem = isRequester ? swap.receiver_item : swap.requester_item
-  const currentStep = getStepIndex(swap.status)
-  const isActive = !['completed', 'declined', 'cancelled', 'disputed'].includes(swap.status)
 
   const requesterPaid = swap.requester_paid === true
 
