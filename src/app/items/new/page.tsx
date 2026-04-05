@@ -13,7 +13,7 @@ export default function NewItemPage() {
   const [customCategory, setCustomCategory] = useState('')
   const [condition, setCondition] = useState('')
   const [estimatedValue, setEstimatedValue] = useState('')
-  const [coversDelivery, setCoversDelivery] = useState(false)
+  const coversDelivery = true
   const [images, setImages] = useState<File[]>([])
   const [previews, setPreviews] = useState<string[]>([])
   const [loading, setLoading] = useState(false)
@@ -256,17 +256,12 @@ export default function NewItemPage() {
           <p className="text-xs text-gray-400 mt-1">Required for escrow protection. This is the amount the other party deposits as a guarantee — refunded automatically when the swap completes.</p>
         </div>
 
-        <label className="flex items-start gap-3 cursor-pointer">
-          <input
-            type="checkbox"
-            checked={coversDelivery}
-            onChange={(e) => setCoversDelivery(e.target.checked)}
-            className="mt-0.5 w-4 h-4 accent-indigo-600 shrink-0"
-          />
-          <span className="text-sm text-gray-700">
-            <strong>I'll cover delivery</strong> — I will pay postage to send my item to the person I swap with
+        <div className="flex items-start gap-3 bg-indigo-50 border border-indigo-100 rounded-xl p-3">
+          <span className="text-indigo-500 mt-0.5">📦</span>
+          <span className="text-sm text-indigo-800">
+            <strong>Delivery is required</strong> — you must pay postage to send your item to the person you swap with. Both parties are responsible for shipping their own item.
           </span>
-        </label>
+        </div>
 
         {category === 'Food & Drinks' && (
           <div className="bg-amber-50 border border-amber-200 rounded-xl p-4">
