@@ -154,18 +154,13 @@ export default function SwapDetailPage() {
     setSending(false)
   }
 
-  async function handleVideoSelect(files: FileList | null) {
+  function handleVideoSelect(files: FileList | null) {
     if (!files || !files[0]) return
     const file = files[0]
     if (file.size > 50 * 1024 * 1024) return
+    if (videoPreview) URL.revokeObjectURL(videoPreview)
     setVideoFile(file)
-    const dataUrl = await new Promise<string>((resolve, reject) => {
-      const reader = new FileReader()
-      reader.onload = () => resolve(reader.result as string)
-      reader.onerror = reject
-      reader.readAsDataURL(file)
-    })
-    setVideoPreview(dataUrl)
+    setVideoPreview(URL.createObjectURL(file))
   }
 
   async function updateSwapStatus(newStatus: SwapStatus) {

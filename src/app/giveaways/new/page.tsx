@@ -38,21 +38,12 @@ export default function NewGiveawayPage() {
     getUser()
   }, [])
 
-  function readFileAsDataURL(file: File): Promise<string> {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader()
-      reader.onload = () => resolve(reader.result as string)
-      reader.onerror = reject
-      reader.readAsDataURL(file)
-    })
-  }
-
-  async function handleFiles(files: FileList | null) {
+  function handleFiles(files: FileList | null) {
     if (!files) return
     const newFiles = Array.from(files).slice(0, 4 - images.length)
     setImages((prev) => [...prev, ...newFiles])
-    const dataUrls = await Promise.all(newFiles.map(readFileAsDataURL))
-    setPreviews((prev) => [...prev, ...dataUrls])
+    const urls = newFiles.map((f) => URL.createObjectURL(f))
+    setPreviews((prev) => [...prev, ...urls])
   }
 
   function removeImage(index: number) {
