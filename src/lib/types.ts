@@ -93,6 +93,7 @@ export interface Item {
   estimated_value?: number | null
   condition?: 'New' | 'Good' | 'Fair' | 'Poor' | null
   covers_delivery?: boolean
+  video_url?: string | null
   created_at: string
   profiles?: Profile
 }
@@ -118,6 +119,7 @@ export interface Message {
   swap_id: string
   sender_id: string
   content: string
+  video_url?: string | null
   created_at: string
   sender?: Profile
 }

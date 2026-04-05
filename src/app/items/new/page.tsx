@@ -16,11 +16,14 @@ export default function NewItemPage() {
   const coversDelivery = true
   const [images, setImages] = useState<File[]>([])
   const [previews, setPreviews] = useState<string[]>([])
+  const [video, setVideo] = useState<File | null>(null)
+  const [videoPreview, setVideoPreview] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [userId, setUserId] = useState<string | null>(null)
   const [userCountry, setUserCountry] = useState('')
   const fileRef = useRef<HTMLInputElement>(null)
+  const videoRef = useRef<HTMLInputElement>(null)
   const router = useRouter()
   const supabase = createClient()
 
@@ -56,6 +59,14 @@ export default function NewItemPage() {
     setPreviews((prev) => prev.filter((_, i) => i !== index))
   }
 
+  function handleVideo(files: FileList | null) {
+    if (!files || !files[0]) return
+    const file = files[0]
+    if (file.size > 50 * 1024 * 1024) { setError('Video must be under 50MB'); return }
+    setVideo(file)
+    setVideoPreview(URL.createObjectURL(file))
+  }
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     if (!userId) return
@@ -79,6 +90,15 @@ export default function NewItemPage() {
       uploadedUrls.push(publicUrl)
     }
 
+    let videoUrl: string | null = null
+    if (video) {
+      const ext = video.name.split('.').pop()
+      const path = `items/${userId}/video-${Date.now()}.${ext}`
+      const { error: videoError } = await supabase.storage.from('images').upload(path, video)
+      if (videoError) { setError('Video upload failed: ' + videoError.message); setLoading(false); return }
+      videoUrl = supabase.storage.from('images').getPublicUrl(path).data.publicUrl
+    }
+
     const finalCategory = category === 'Other' && customCategory.trim()
       ? customCategory.trim()
       : category
@@ -93,6 +113,7 @@ export default function NewItemPage() {
       covers_delivery: coversDelivery,
       estimated_value: parseFloat(estimatedValue) || 0,
       ...(condition ? { condition } : {}),
+      ...(videoUrl ? { video_url: videoUrl } : {}),
     }).select('id').single()
 
     if (insertError) {
@@ -162,6 +183,35 @@ export default function NewItemPage() {
             className="hidden"
             onChange={(e) => handleFiles(e.target.files)}
           />
+        </div>
+
+        {/* Video upload */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Video <span className="text-gray-400 font-normal">(optional, max 50MB)</span>
+          </label>
+          {videoPreview ? (
+            <div className="relative rounded-xl overflow-hidden bg-black">
+              <video src={videoPreview} controls className="w-full max-h-48 object-contain" />
+              <button
+                type="button"
+                onClick={() => { setVideo(null); setVideoPreview(null) }}
+                className="absolute top-2 right-2 bg-black/60 text-white rounded-full p-1"
+              >
+                <X size={14} />
+              </button>
+            </div>
+          ) : (
+            <button
+              type="button"
+              onClick={() => videoRef.current?.click()}
+              className="w-full py-4 border-2 border-dashed border-gray-200 rounded-xl flex flex-col items-center justify-center text-gray-400 hover:border-indigo-400 hover:text-indigo-400 transition-colors gap-1"
+            >
+              <Upload size={20} />
+              <span className="text-sm">Add a video to show your item in action</span>
+            </button>
+          )}
+          <input ref={videoRef} type="file" accept="video/*" className="hidden" onChange={(e) => handleVideo(e.target.files)} />
         </div>
 
         <div>

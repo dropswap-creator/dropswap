@@ -14,6 +14,7 @@ const securityHeaders = [
       "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
       "font-src 'self' https://fonts.gstatic.com",
       "img-src 'self' data: blob: https://*.supabase.co https://twemoji.maxcdn.com https://cdn.jsdelivr.net https://www.dropswap.co.uk",
+      "media-src 'self' blob: https://*.supabase.co",
       "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://api.resend.com https://api.stripe.com",
       "frame-src https://js.stripe.com https://hooks.stripe.com",
       "worker-src 'self' blob:",

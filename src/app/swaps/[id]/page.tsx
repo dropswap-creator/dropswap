@@ -8,7 +8,7 @@ import { createClient } from '@/lib/supabase'
 import TrustScore from '@/components/TrustScore'
 import type { Swap, Message, Rating, SwapStatus } from '@/lib/types'
 import {
-  Send, AlertTriangle, CheckCircle, Package, Star, ArrowLeftRight
+  Send, AlertTriangle, CheckCircle, Package, Star, ArrowLeftRight, Video, X
 } from 'lucide-react'
 import StripePayButton from '@/components/StripePayButton'
 
@@ -40,6 +40,9 @@ export default function SwapDetailPage() {
   const [userId, setUserId] = useState<string | null>(null)
   const [text, setText] = useState('')
   const [sending, setSending] = useState(false)
+  const [videoFile, setVideoFile] = useState<File | null>(null)
+  const [videoPreview, setVideoPreview] = useState<string | null>(null)
+  const videoInputRef = useRef<HTMLInputElement>(null)
   const [rating, setRating] = useState(0)
   const [ratingComment, setRatingComment] = useState('')
   const [myRating, setMyRating] = useState<Rating | null>(null)
@@ -124,12 +127,39 @@ export default function SwapDetailPage() {
 
   async function sendMessage(e: React.FormEvent) {
     e.preventDefault()
-    if (!text.trim() || !userId) return
+    if ((!text.trim() && !videoFile) || !userId) return
     setSending(true)
-    const content = text.trim()
-    const { error } = await supabase.from('messages').insert({ swap_id: id, sender_id: userId, content })
-    if (!error) setText('')
+
+    let videoUrl: string | null = null
+    if (videoFile) {
+      const ext = videoFile.name.split('.').pop()
+      const path = `messages/${id}/${Date.now()}.${ext}`
+      const { error: uploadError } = await supabase.storage.from('images').upload(path, videoFile)
+      if (!uploadError) {
+        videoUrl = supabase.storage.from('images').getPublicUrl(path).data.publicUrl
+      }
+    }
+
+    const { error } = await supabase.from('messages').insert({
+      swap_id: id,
+      sender_id: userId,
+      content: text.trim() || '',
+      ...(videoUrl ? { video_url: videoUrl } : {}),
+    })
+    if (!error) {
+      setText('')
+      setVideoFile(null)
+      setVideoPreview(null)
+    }
     setSending(false)
+  }
+
+  function handleVideoSelect(files: FileList | null) {
+    if (!files || !files[0]) return
+    const file = files[0]
+    if (file.size > 50 * 1024 * 1024) return
+    setVideoFile(file)
+    setVideoPreview(URL.createObjectURL(file))
   }
 
   async function updateSwapStatus(newStatus: SwapStatus) {
@@ -483,40 +513,75 @@ export default function SwapDetailPage() {
             return (
               <div key={msg.id} className={`flex ${isMe ? 'justify-end' : 'justify-start'}`}>
                 <div
-                  className={`max-w-xs px-3 py-2 rounded-2xl text-sm ${
+                  className={`max-w-xs rounded-2xl text-sm overflow-hidden ${
                     isMe
                       ? 'bg-indigo-600 text-white rounded-br-sm'
                       : 'bg-gray-100 text-gray-900 rounded-bl-sm'
                   }`}
                 >
-                  {!isMe && (
-                    <p className={`text-xs mb-1 font-medium ${isMe ? 'text-indigo-200' : 'text-gray-500'}`}>
-                      {msg.sender?.username || 'User'}
-                    </p>
+                  {msg.video_url && (
+                    <video
+                      src={msg.video_url}
+                      controls
+                      className="w-full max-w-xs rounded-t-2xl"
+                      style={{ maxHeight: 200 }}
+                    />
                   )}
-                  {msg.content}
+                  {(msg.content || !msg.video_url) && (
+                    <div className="px-3 py-2">
+                      {!isMe && (
+                        <p className={`text-xs mb-1 font-medium ${isMe ? 'text-indigo-200' : 'text-gray-500'}`}>
+                          {msg.sender?.username || 'User'}
+                        </p>
+                      )}
+                      {msg.content}
+                    </div>
+                  )}
                 </div>
               </div>
             )
           })}
           <div ref={bottomRef} />
         </div>
-        <form onSubmit={sendMessage} className="p-3 border-t border-gray-50 flex gap-2">
-          <input
-            type="text"
-            value={text}
-            onChange={(e) => setText(e.target.value)}
-            placeholder="Type a message..."
-            className="flex-1 px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
-          />
-          <button
-            type="submit"
-            disabled={!text.trim() || sending}
-            className="bg-indigo-600 text-white p-2 rounded-xl hover:bg-indigo-700 transition-colors disabled:opacity-50"
-          >
-            <Send size={18} />
-          </button>
-        </form>
+        <div className="border-t border-gray-50">
+          {videoPreview && (
+            <div className="relative p-2">
+              <video src={videoPreview} className="w-full max-h-32 rounded-xl object-contain bg-black" />
+              <button
+                type="button"
+                onClick={() => { setVideoFile(null); setVideoPreview(null) }}
+                className="absolute top-3 right-3 bg-black/60 text-white rounded-full p-0.5"
+              >
+                <X size={12} />
+              </button>
+            </div>
+          )}
+          <form onSubmit={sendMessage} className="p-3 flex gap-2">
+            <button
+              type="button"
+              onClick={() => videoInputRef.current?.click()}
+              className="text-gray-400 hover:text-indigo-500 transition-colors p-2 rounded-xl hover:bg-gray-50 shrink-0"
+              title="Send a video"
+            >
+              <Video size={18} />
+            </button>
+            <input
+              type="text"
+              value={text}
+              onChange={(e) => setText(e.target.value)}
+              placeholder="Type a message..."
+              className="flex-1 px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            />
+            <button
+              type="submit"
+              disabled={(!text.trim() && !videoFile) || sending}
+              className="bg-indigo-600 text-white p-2 rounded-xl hover:bg-indigo-700 transition-colors disabled:opacity-50"
+            >
+              <Send size={18} />
+            </button>
+          </form>
+          <input ref={videoInputRef} type="file" accept="video/*" className="hidden" onChange={(e) => handleVideoSelect(e.target.files)} />
+        </div>
       </div>
     </div>
   )
