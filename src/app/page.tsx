@@ -247,7 +247,7 @@ export default function HomePage() {
       {/* Environmental Impact */}
       <div className="mb-14">
         <h2 className="text-2xl font-bold text-gray-900 text-center mb-2">Good for your wallet. Good for the planet.</h2>
-        <p className="text-gray-500 text-center mb-8">Trade like the old days — circular, local, human</p>
+        <p className="text-gray-500 text-center mb-8">Back to basics — swap with your neighbours.</p>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
           {[
             {
