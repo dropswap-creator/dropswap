@@ -154,13 +154,13 @@ export default function NewItemPage() {
           </label>
           <div className="grid grid-cols-4 gap-2 mb-2">
             {previews.map((src, i) => (
-              <div key={i} className="relative aspect-square rounded-lg overflow-hidden bg-gray-100">
+              <div key={i} style={{ position: 'relative', width: '100%', paddingBottom: '100%', borderRadius: 8, overflow: 'hidden', background: '#f3f4f6' }}>
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={src} alt="" className="w-full h-full object-cover" />
+                <img src={src} alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
                 <button
                   type="button"
                   onClick={() => removeImage(i)}
-                  className="absolute top-1 right-1 bg-black/60 text-white rounded-full p-0.5"
+                  style={{ position: 'absolute', top: 4, right: 4, background: 'rgba(0,0,0,0.6)', color: 'white', borderRadius: '50%', border: 'none', padding: 2, cursor: 'pointer', display: 'flex' }}
                 >
                   <X size={12} />
                 </button>
@@ -180,7 +180,7 @@ export default function NewItemPage() {
           <input
             ref={fileRef}
             type="file"
-            accept="image/*"
+            accept="image/jpeg,image/png,image/webp,image/gif"
             multiple
             className="hidden"
             onChange={(e) => handleFiles(e.target.files)}
